@@ -7,7 +7,6 @@ import com.catchiz.enrollctrl.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -20,7 +19,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Resource
+    @Autowired
     private StringRedisTemplate redisTemplate;
 
     @GetMapping("/getInviteCode")

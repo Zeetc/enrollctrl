@@ -3,8 +3,11 @@ package com.catchiz.enrollctrl.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 import java.io.Serializable;
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,11 +31,9 @@ public class JwtTokenUtil implements Serializable {
      */
     private static String generateToken(Map<String, Object> claims) {
         Date expirationDate = new Date(System.currentTimeMillis() + 3600L * 1000);
-        return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        Key key = Keys.hmacShaKeyFor(keyBytes);
+        return Jwts.builder().setClaims(claims).signWith(key).setExpiration(expirationDate).compact();
     }
 
     /**

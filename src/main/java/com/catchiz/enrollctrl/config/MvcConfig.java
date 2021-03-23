@@ -1,22 +1,29 @@
 package com.catchiz.enrollctrl.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        //设置允许跨域的路径
+        //对那些请求路径进行跨域处理
         registry.addMapping("/**")
-                //设置允许跨域请求的域名
-                .allowedOrigins("*")  //也可以指定域名 .allowedOrigins("http://192.168.0.0:8080","http://192.168.0.1:8081")
-                //是否允许证书 不再默认开启
-                .allowCredentials(true)
-                //设置允许的方法
+                // 允许的请求头，默认允许所有的请求头
+                .allowedHeaders("*")
+                // 允许的方法，默认允许GET、POST、HEAD
                 .allowedMethods("*")
-                //跨域允许时间
-                .maxAge(3600);
+                // 探测请求有效时间，单位秒
+                .maxAge(1800)
+                // 支持的域
+                .allowedOrigins("*");
     }
 }

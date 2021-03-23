@@ -3,6 +3,7 @@ package com.catchiz.enrollctrl.service.impl;
 import com.catchiz.enrollctrl.exception.MyAccessDeniedException;
 import com.catchiz.enrollctrl.exception.MyAuthenticationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -28,7 +29,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Resource
     private SysUserDetailsService sysUserDetailsService;
 
-    @Resource
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     private final StringRedisTemplate redisTemplate;
@@ -54,13 +55,12 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         // userDetails为数据库中查询到的用户信息
         UserDetails userDetails = sysUserDetailsService.loadUserByUsername(inputName);
         String password = userDetails.getPassword();
-        // 密码加密后
-        String encodePassword = passwordEncoder.encode(inputPassword);
         // 校验密码是否一致
-        if (!passwordEncoder.matches(password,encodePassword)) {
+        //System.out.println("match:"+passwordEncoder.matches(inputPassword,password));
+        if (!passwordEncoder.matches(inputPassword,password)) {
             throw new MyAuthenticationException("密码错误");
         }
-        return new UsernamePasswordAuthenticationToken(inputName, encodePassword, userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(inputName, password, userDetails.getAuthorities());
     }
 
     private boolean validateVerify(String inputVerify,String uuid) {
