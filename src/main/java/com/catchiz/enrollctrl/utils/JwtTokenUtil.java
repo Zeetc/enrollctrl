@@ -57,7 +57,7 @@ public class JwtTokenUtil implements Serializable {
      * @return 令牌
      */
     public static String generateToken(String username,boolean isManager) {
-        Map<String, Object> claims = new HashMap<>(2);
+        Map<String, Object> claims = new HashMap<>(3);
         claims.put("sub", username);
         claims.put("created", new Date());
         claims.put("isManager",isManager);

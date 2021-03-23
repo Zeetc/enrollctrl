@@ -2,6 +2,7 @@ package com.catchiz.enrollctrl.mapper;
 
 import com.catchiz.enrollctrl.pojo.User;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -27,4 +28,16 @@ public interface UserMapper {
 
     @Select("select * from user")
     List<User> listAllUser();
+
+    @Select("select departmentId from user where username = #{username}")
+    Integer getDepartmentIdByUsername(String username);
+
+    @Update("update from user set username = #{name} where username = #{username}")
+    void changeUsername(@Param("name") String name, @Param("username") String username);
+
+    @Update("update from user set describe = #{describe} where username = #{username}")
+    void changeDescribe(@Param("describe") String describe, @Param("username") String username);
+
+    @Update("update from user set gender = #{gender} where username = #{username}")
+    void changeGender(@Param("gender") Integer gender, @Param("username") String username);
 }

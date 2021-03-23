@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -35,7 +36,7 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @Autowired
+    @Resource
     private StringRedisTemplate redisTemplate;
 
     @Autowired

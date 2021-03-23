@@ -55,4 +55,24 @@ public class UserServiceImpl implements UserService {
     public List<User> listAllUser() {
         return userMapper.listAllUser();
     }
+
+    @Override
+    public Integer getDepartmentIdByUsername(String username) {
+        return userMapper.getDepartmentIdByUsername(username);
+    }
+
+    @Override
+    public void changeUsername(String name, String username) {
+        userMapper.changeUsername(name,username);
+    }
+
+    @Override
+    public void changeDescribe(String describe, String username) {
+        userMapper.changeDescribe(describe,username);
+    }
+
+    @Override
+    public void changeGender(Integer gender, String username) {
+        userMapper.changeGender(gender,username);
+    }
 }

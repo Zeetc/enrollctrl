@@ -1,10 +1,10 @@
 package com.catchiz.enrollctrl.handler;
 
-import com.catchiz.pojo.CommonResult;
-import com.catchiz.pojo.CommonStatus;
-import com.catchiz.pojo.User;
-import com.catchiz.service.UserService;
-import com.catchiz.utils.JwtTokenUtil;
+import com.catchiz.enrollctrl.pojo.CommonResult;
+import com.catchiz.enrollctrl.pojo.CommonStatus;
+import com.catchiz.enrollctrl.pojo.User;
+import com.catchiz.enrollctrl.service.UserService;
+import com.catchiz.enrollctrl.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -34,7 +34,7 @@ public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticatio
         logger.info("登录成功");
         response.setContentType("application/json;charset=UTF-8");
         String username=authentication.getName();
-        User user= userService.getUserById(Integer.parseInt(username));
+        User user= userService.getUserByUsername(username);
         String token = JwtTokenUtil.generateToken(username,user.getIsManager());
         user.setPassword(null);
         response.getWriter().write(objectMapper.writeValueAsString(new CommonResult(CommonStatus.OK,"登录成功", Arrays.asList(token,user))));

@@ -18,4 +18,12 @@ public interface UserService {
     void delUser(String username);
 
     List<User> listAllUser();
+
+    Integer getDepartmentIdByUsername(String username);
+
+    void changeUsername(String name, String username);
+
+    void changeDescribe(String describe, String username);
+
+    void changeGender(Integer gender, String username);
 }

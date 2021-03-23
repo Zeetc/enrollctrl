@@ -1,7 +1,7 @@
 package com.catchiz.enrollctrl.handler;
 
-import com.catchiz.pojo.CommonResult;
-import com.catchiz.pojo.CommonStatus;
+import com.catchiz.enrollctrl.pojo.CommonResult;
+import com.catchiz.enrollctrl.pojo.CommonStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
