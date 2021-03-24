@@ -26,4 +26,6 @@ public interface UserService {
     void changeDescribe(String describe, String username);
 
     void changeGender(Integer gender, String username);
+
+    void changePassword(String username, String newPassword);
 }

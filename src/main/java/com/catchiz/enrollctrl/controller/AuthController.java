@@ -1,8 +1,9 @@
 package com.catchiz.enrollctrl.controller;
 
-import com.catchiz.enrollctrl.pojo.CommonResult;
-import com.catchiz.enrollctrl.pojo.CommonStatus;
-import com.catchiz.enrollctrl.pojo.User;
+import com.catchiz.enrollctrl.pojo.*;
+import com.catchiz.enrollctrl.service.AnswerService;
+import com.catchiz.enrollctrl.service.ProblemService;
+import com.catchiz.enrollctrl.service.QuestionnaireService;
 import com.catchiz.enrollctrl.service.UserService;
 import com.catchiz.enrollctrl.valid.RegisterGroup;
 import io.swagger.annotations.ApiOperation;
@@ -10,13 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +23,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +41,9 @@ public class AuthController {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private QuestionnaireService questionnaireService;
 
     @Value("${spring.mail.username}")
     private String emailSendUser;
@@ -163,20 +166,7 @@ public class AuthController {
         if(!userService.hasSameUsername(username))return new CommonResult(CommonStatus.FORBIDDEN,"无该用户");
         ValueOperations<String, String> operations = redisTemplate.opsForValue();
         if(operations.get(username)!=null)return new CommonResult(CommonStatus.FORBIDDEN,"频繁请求, 1分钟后再试");
-        String uuid= UUID.randomUUID().toString().substring(0,6);
-        operations.set(uuid, username,24, TimeUnit.HOURS);
-        operations.set(username,username,1, TimeUnit.MINUTES);
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(emailSendUser);
-        message.setTo(userService.getEmailByUsername(username));
-        message.setSubject("修改密码邮箱验证");
-        message.setText("验证码是："+uuid);
-        try {
-            mailSender.send(message);
-        } catch (Exception e) {
-            return new CommonResult(CommonStatus.EXCEPTION,"邮箱发送失败");
-        }
-        return new CommonResult(CommonStatus.OK,"申请成功");
+        return UserController.sendEmailVerifyCode(username, operations, emailSendUser, userService, mailSender);
     }
 
     @PatchMapping("/resetPassword")
@@ -194,5 +184,26 @@ public class AuthController {
         redisTemplate.delete(verifyCode);
         userService.resetPassword(username,password);
         return new CommonResult(CommonStatus.OK,"修改成功");
+    }
+
+    @Autowired
+    private ProblemService problemService;
+
+    @Autowired
+    private AnswerService answerService;
+
+    @GetMapping("/getQuestionnaire")
+    public CommonResult getQuestionnaire(Integer questionnaireId){
+        if(questionnaireId==null||questionnaireService.getQuestionnaireByQuestionnaireId(questionnaireId)==null){
+            return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
+        }
+        List<Problem> problemList=problemService.listProblemsByQuestionnaireId(questionnaireId);
+        return new CommonResult(CommonStatus.OK,"查询成功",problemList);
+    }
+
+    @PostMapping("/answerQuestions")
+    public CommonResult answerQuestions(List<Answer> answers){
+        answerService.answerQuestions(answers);
+        return new CommonResult(CommonStatus.OK,"提交成功");
     }
 }

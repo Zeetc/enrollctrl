@@ -6,11 +6,13 @@ import com.catchiz.enrollctrl.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
@@ -74,5 +76,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changeGender(Integer gender, String username) {
         userMapper.changeGender(gender,username);
+    }
+
+    @Override
+    public void changePassword(String username, String newPassword) {
+        userMapper.changePassword(username,passwordEncoder.encode(newPassword));
     }
 }
