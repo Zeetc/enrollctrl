@@ -2,7 +2,6 @@ package com.catchiz.enrollctrl.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
@@ -43,8 +42,9 @@ public class JwtTokenUtil implements Serializable {
      */
     public static Claims getClaimsFromToken(String token) {
         try {
-            return Jwts.parser()
+            return Jwts.parserBuilder()
                     .setSigningKey(secret)
+                    .build()
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {

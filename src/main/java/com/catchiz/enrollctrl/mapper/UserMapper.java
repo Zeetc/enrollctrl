@@ -20,7 +20,7 @@ public interface UserMapper {
     @Select("select email from user where username = #{username}")
     String getEmailByUsername(String username);
 
-    @Update("update from user set password = #{password} where username = #{username}")
+    @Update("update user set password = #{password} where username = #{username}")
     void resetPassword(@Param("username") String username, @Param("password") String password);
 
     @Select("select * from user where username = #{username}")
@@ -32,12 +32,12 @@ public interface UserMapper {
     @Select("select departmentId from user where username = #{username}")
     Integer getDepartmentIdByUsername(String username);
 
-    @Update("update from user set username = #{name} where username = #{username}")
+    @Update("update user set username = #{name} where username = #{username}")
     void changeUsername(@Param("name") String name, @Param("username") String username);
 
-    @Update("update from user set describe = #{describe} where username = #{username}")
+    @Update("update user set describe = #{describe} where username = #{username}")
     void changeDescribe(@Param("describe") String describe, @Param("username") String username);
 
-    @Update("update from user set gender = #{gender} where username = #{username}")
+    @Update("update user set gender = #{gender} where username = #{username}")
     void changeGender(@Param("gender") Integer gender, @Param("username") String username);
 }
