@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.catchiz.enrollctrl.mapper.ProblemMapper;
 import com.catchiz.enrollctrl.pojo.Problem;
 import com.catchiz.enrollctrl.service.ProblemService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,8 +12,12 @@ import java.util.List;
 @Service
 @Transactional
 public class ProblemServiceImpl implements ProblemService {
-    @Autowired
-    private ProblemMapper problemMapper;
+    private final ProblemMapper problemMapper;
+
+    public ProblemServiceImpl(ProblemMapper problemMapper) {
+        this.problemMapper = problemMapper;
+    }
+
     @Override
     public List<Problem> listProblemsByQuestionnaireId(Integer questionnaireId) {
         List<Problem> problems=problemMapper.listProblemsByQuestionnaireId(questionnaireId);
@@ -32,5 +35,11 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public List<Problem> getProblemIdsByQuestionnaireId(Integer questionnaireId) {
         return problemMapper.getProblemIdsByQuestionnaireId(questionnaireId);
+    }
+
+    @Override
+    public void changeProblem(Problem p) {
+        p.setJsonVal(JSON.toJSONString(p.getVal()));
+        problemMapper.changeProblem(p);
     }
 }

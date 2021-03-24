@@ -4,6 +4,7 @@ import com.catchiz.enrollctrl.pojo.Problem;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -20,4 +21,7 @@ public interface ProblemMapper {
 
     @Select("select * from question where questionnaireId = #{questionnaireId}")
     List<Problem> getProblemIdsByQuestionnaireId(Integer questionnaireId);
+
+    @Update("update problem set title = #{title} and type = #{type} and #{jsonVal} = #{jsonVal} where id = #{id}")
+    void changeProblem(Problem p);
 }

@@ -6,7 +6,6 @@ import com.catchiz.enrollctrl.pojo.Answer;
 import com.catchiz.enrollctrl.pojo.Problem;
 import com.catchiz.enrollctrl.service.AnswerService;
 import com.catchiz.enrollctrl.service.ProblemService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,16 +15,21 @@ import java.util.UUID;
 @Service
 @Transactional
 public class AnswerServiceImpl implements AnswerService {
-    @Autowired
-    private AnswerMapper answerMapper;
-    @Autowired
-    private ProblemService problemService;
+    private final AnswerMapper answerMapper;
+    private final ProblemService problemService;
+
+    public AnswerServiceImpl(AnswerMapper answerMapper, ProblemService problemService) {
+        this.answerMapper = answerMapper;
+        this.problemService = problemService;
+    }
+
     @Override
-    public void answerQuestions(List<Answer> answers) {
+    public void answerQuestions(List<Answer> answers, Integer questionnaireId) {
         String author= UUID.randomUUID().toString();
         for (Answer answer : answers) {
             Problem problem=problemService.getProblemByProblemId(answer.getProblemId());
             if(problem==null)continue;
+            if(!problem.getQuestionnaireId().equals(questionnaireId))continue;
             answer.setJsonVal(JSON.toJSONString(answer.getVal()));
             answer.setAuthor(author);
             answerMapper.insertAnswer(answer);

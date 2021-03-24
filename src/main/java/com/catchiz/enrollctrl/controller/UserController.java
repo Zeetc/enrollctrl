@@ -5,7 +5,7 @@ import com.catchiz.enrollctrl.service.ProblemService;
 import com.catchiz.enrollctrl.service.QuestionnaireService;
 import com.catchiz.enrollctrl.service.UserService;
 import com.catchiz.enrollctrl.utils.JwtTokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -23,39 +23,44 @@ import java.util.concurrent.TimeUnit;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/user")
 public class UserController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private StringRedisTemplate redisTemplate;
+    private final StringRedisTemplate redisTemplate;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
-    @Autowired
-    private ProblemService problemService;
+    private final ProblemService problemService;
 
-    @Autowired
-    private QuestionnaireService questionnaireService;
+    private final QuestionnaireService questionnaireService;
 
     @Value("${spring.mail.username}")
     private String emailSendUser;
 
+    public UserController(UserService userService, StringRedisTemplate redisTemplate, PasswordEncoder passwordEncoder, JavaMailSender mailSender, ProblemService problemService, QuestionnaireService questionnaireService) {
+        this.userService = userService;
+        this.redisTemplate = redisTemplate;
+        this.passwordEncoder = passwordEncoder;
+        this.mailSender = mailSender;
+        this.problemService = problemService;
+        this.questionnaireService = questionnaireService;
+    }
+
 
     @GetMapping("/getInviteCode")
+    @ApiOperation("生成邀请码，有效期7天")
     public CommonResult getInviteCode(@RequestHeader String Authorization){
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
         Integer departmentId=userService.getDepartmentIdByUsername(username);
         ValueOperations<String, String> operations = redisTemplate.opsForValue();
         String inviteCode = UUID.randomUUID().toString().substring(0,7);
-        operations.set(inviteCode,departmentId.toString());
+        operations.set(inviteCode,departmentId.toString(),7,TimeUnit.DAYS);
         return new CommonResult(CommonStatus.CREATE,"创建成功",inviteCode);
     }
 
     @PatchMapping("/changePassword")
+    @ApiOperation("更改密码")
     public CommonResult changePassword(String originPassword,
                                        String newPassword,
                                        @RequestHeader String Authorization){
@@ -69,6 +74,7 @@ public class UserController {
     }
 
     @PatchMapping("/changeUsername")
+    @ApiOperation("更改用户名，不能与其他用户重名")
     public CommonResult changeUsername(String name,
                                        @RequestHeader String Authorization){
         if(userService.hasSameUsername(name))return new CommonResult(CommonStatus.FORBIDDEN,"用户名已被占用");
@@ -78,6 +84,7 @@ public class UserController {
     }
 
     @PatchMapping("/changeDescribe")
+    @ApiOperation("更改个人描述")
     public CommonResult changeDescribe(String describe,
                                        @RequestHeader String Authorization){
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
@@ -86,6 +93,7 @@ public class UserController {
     }
 
     @PatchMapping("/changeGender")
+    @ApiOperation("更改性别")
     public CommonResult changeGender(Integer gender,
                                      @RequestHeader String Authorization){
         if(gender==null||gender>2||gender<0)return new CommonResult(CommonStatus.FORBIDDEN,"输入不合法");
@@ -95,6 +103,7 @@ public class UserController {
     }
 
     @GetMapping("/applyForChangeEmail")
+    @ApiOperation("申请更改邮箱")
     public CommonResult applyForChangeEmail(@RequestHeader String Authorization){
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
         if(!StringUtils.hasText(username))return new CommonResult(CommonStatus.FORBIDDEN,"输入不合法");
@@ -103,7 +112,23 @@ public class UserController {
         return sendEmailVerifyCode(username, operations, emailSendUser, userService, mailSender);
     }
 
+    @PatchMapping("/resetEmail")
+    @ApiOperation("更改邮箱")
+    public CommonResult resetEmail(String inputVerify,String uuid,String email,
+                                   @RequestHeader String Authorization){
+        String username = JwtTokenUtil.getUsernameFromToken(Authorization);
+        if(!StringUtils.hasText(username)||!StringUtils.hasText(inputVerify)||!StringUtils.hasText(uuid))return new CommonResult(CommonStatus.FORBIDDEN,"输入不合法");
+        ValueOperations<String, String> operations = redisTemplate.opsForValue();
+        String verifyCode = operations.get(uuid);
+        if(verifyCode==null||!verifyCode.equals(inputVerify)){
+            return new CommonResult(CommonStatus.NOTFOUND,"验证码错误");
+        }
+        userService.resetEmail(username,email);
+        return new CommonResult(CommonStatus.OK,"修改成功");
+    }
+
     @GetMapping("/listProblemsByQuestionnaireId")
+    @ApiOperation("获取某问卷的所有题目")
     public CommonResult listProblemsByQuestionnaireId(Integer questionnaireId,
                                                       @RequestHeader String Authorization){
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
@@ -116,6 +141,20 @@ public class UserController {
         return new CommonResult(CommonStatus.OK,"查询成功",problemList);
     }
 
+    @PatchMapping("/changeProblem")
+    @ApiOperation(("修改问卷题目"))
+    public CommonResult changeProblem(Problem p,
+                                      @RequestHeader String Authorization){
+        String username = JwtTokenUtil.getUsernameFromToken(Authorization);
+        User user= userService.getUserByUsername(username);
+        if(user==null)return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
+        Problem problem= problemService.getProblemByProblemId(p.getId());
+        Questionnaire questionnaire = questionnaireService.getQuestionnaireByQuestionnaireId(problem.getQuestionnaireId());
+        if(!user.getDepartmentId().equals(questionnaire.getDepartmentId()))return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
+        problemService.changeProblem(p);
+        return new CommonResult(CommonStatus.OK,"修改成功");
+    }
+
 
     static CommonResult sendEmailVerifyCode(String username, ValueOperations<String, String> operations, String emailSendUser, UserService userService, JavaMailSender mailSender) {
         String uuid= UUID.randomUUID().toString().substring(0,6);
@@ -124,7 +163,7 @@ public class UserController {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(emailSendUser);
         message.setTo(userService.getEmailByUsername(username));
-        message.setSubject("修改密码邮箱验证");
+        message.setSubject("修改验证");
         message.setText("验证码是："+uuid);
         try {
             mailSender.send(message);

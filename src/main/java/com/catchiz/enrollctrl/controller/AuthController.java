@@ -7,7 +7,6 @@ import com.catchiz.enrollctrl.service.QuestionnaireService;
 import com.catchiz.enrollctrl.service.UserService;
 import com.catchiz.enrollctrl.valid.RegisterGroup;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -23,6 +22,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -33,22 +33,28 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private StringRedisTemplate redisTemplate;
+    private final StringRedisTemplate redisTemplate;
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
-    @Autowired
-    private QuestionnaireService questionnaireService;
+    private final QuestionnaireService questionnaireService;
 
     @Value("${spring.mail.username}")
     private String emailSendUser;
 
+    public AuthController(UserService userService, StringRedisTemplate redisTemplate, JavaMailSender mailSender, QuestionnaireService questionnaireService, ProblemService problemService, AnswerService answerService) {
+        this.userService = userService;
+        this.redisTemplate = redisTemplate;
+        this.mailSender = mailSender;
+        this.questionnaireService = questionnaireService;
+        this.problemService = problemService;
+        this.answerService = answerService;
+    }
+
     @PostMapping("/register")
+    @ApiOperation("用户登录，需要邀请码，同时需要输入验证码")
     public CommonResult register(@Validated({RegisterGroup.class}) User user, Integer inviteCode, String inputVerify,
                                  @RequestHeader String Authorization){
         ValueOperations<String, String> operations = redisTemplate.opsForValue();
@@ -68,6 +74,7 @@ public class AuthController {
         userService.register(user);
         return new CommonResult(CommonStatus.CREATE,"注册成功");
     }
+
     @GetMapping("/getVerifyCode")
     @ApiOperation("获取验证码的Authorization")
     public CommonResult getVerifyCode() {
@@ -186,24 +193,36 @@ public class AuthController {
         return new CommonResult(CommonStatus.OK,"修改成功");
     }
 
-    @Autowired
-    private ProblemService problemService;
+    private final ProblemService problemService;
 
-    @Autowired
-    private AnswerService answerService;
+    private final AnswerService answerService;
 
     @GetMapping("/getQuestionnaire")
+    @ApiOperation("获取问卷题目，供游客进行直接答题")
     public CommonResult getQuestionnaire(Integer questionnaireId){
         if(questionnaireId==null||questionnaireService.getQuestionnaireByQuestionnaireId(questionnaireId)==null){
             return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
         }
         List<Problem> problemList=problemService.listProblemsByQuestionnaireId(questionnaireId);
-        return new CommonResult(CommonStatus.OK,"查询成功",problemList);
+        String uuid=UUID.randomUUID().toString();
+        redisTemplate.opsForValue().set(uuid,questionnaireId.toString(),1,TimeUnit.DAYS);
+        return new CommonResult(CommonStatus.OK,"查询成功", Arrays.asList(problemList,uuid));
     }
 
     @PostMapping("/answerQuestions")
-    public CommonResult answerQuestions(List<Answer> answers){
-        answerService.answerQuestions(answers);
+    @ApiOperation("提交问卷答案")
+    public CommonResult answerQuestions(List<Answer> answers,
+                                        @RequestHeader String Authorization){
+        if(!StringUtils.hasText(Authorization))return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");
+        int questionnaireId;
+        try {
+            String s=redisTemplate.opsForValue().get(Authorization);
+            if(!StringUtils.hasText(s))return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
+            questionnaireId = Integer.parseInt(s);
+        }catch (Exception e){
+            return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
+        }
+        answerService.answerQuestions(answers,questionnaireId);
         return new CommonResult(CommonStatus.OK,"提交成功");
     }
 }

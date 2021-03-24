@@ -6,7 +6,7 @@ import com.catchiz.enrollctrl.service.ProblemService;
 import com.catchiz.enrollctrl.service.QuestionnaireService;
 import com.catchiz.enrollctrl.service.UserService;
 import com.catchiz.enrollctrl.utils.JwtTokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -19,17 +19,21 @@ import java.util.List;
 @RestController
 public class QuestionnaireController {
 
-    @Autowired
-    private QuestionnaireService questionnaireService;
+    private final QuestionnaireService questionnaireService;
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private ProblemService problemService;
-    @Autowired
-    private AnswerService answerService;
+    private final UserService userService;
+    private final ProblemService problemService;
+    private final AnswerService answerService;
+
+    public QuestionnaireController(QuestionnaireService questionnaireService, UserService userService, ProblemService problemService, AnswerService answerService) {
+        this.questionnaireService = questionnaireService;
+        this.userService = userService;
+        this.problemService = problemService;
+        this.answerService = answerService;
+    }
 
     @PostMapping("/insertQuestionnaire")
+    @ApiOperation("创建问卷并提交")
     public CommonResult insertQuestionnaire(Questionnaire questionnaire,
                                             List<Problem> problems,
                                             @RequestHeader String Authorization){
@@ -41,6 +45,7 @@ public class QuestionnaireController {
     }
 
     @GetMapping("/getAnswerByQuestionnaireId")
+    @ApiOperation("获取该问卷的所有答案，按照题目区分list ==>（list[0]就是第一题的所有答案）")
     public CommonResult getAnswerByQuestionnaireId(Integer questionnaireId,
                                                    @RequestHeader String Authorization){
         if(questionnaireId==null)return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");

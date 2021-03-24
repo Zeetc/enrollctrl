@@ -10,4 +10,6 @@ public interface ProblemService {
     Problem getProblemByProblemId(Integer problemId);
 
     List<Problem> getProblemIdsByQuestionnaireId(Integer questionnaireId);
+
+    void changeProblem(Problem p);
 }

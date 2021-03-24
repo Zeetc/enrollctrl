@@ -6,20 +6,24 @@ import com.catchiz.enrollctrl.pojo.User;
 import com.catchiz.enrollctrl.service.DepartmentService;
 import com.catchiz.enrollctrl.service.UserService;
 import com.catchiz.enrollctrl.utils.JwtTokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/department")
 public class DepartmentController {
-    @Autowired
-    private DepartmentService departmentService;
+    private final DepartmentService departmentService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public DepartmentController(DepartmentService departmentService, UserService userService) {
+        this.departmentService = departmentService;
+        this.userService = userService;
+    }
 
     @PatchMapping("/changeDepartmentName")
+    @ApiOperation("更改部门名字")
     public CommonResult changeDepartmentName(Integer departmentId,String name,
                                              @RequestHeader String Authorization){
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
@@ -32,6 +36,7 @@ public class DepartmentController {
     }
 
     @PatchMapping("/changeDepartmentDescribe")
+    @ApiOperation("更改部门描述")
     public CommonResult changeDepartmentDescribe(Integer departmentId,String describe,
                                                  @RequestHeader String Authorization){
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);

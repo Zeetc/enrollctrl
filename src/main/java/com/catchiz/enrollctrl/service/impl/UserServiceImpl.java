@@ -3,7 +3,6 @@ package com.catchiz.enrollctrl.service.impl;
 import com.catchiz.enrollctrl.mapper.UserMapper;
 import com.catchiz.enrollctrl.pojo.User;
 import com.catchiz.enrollctrl.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +13,14 @@ import java.util.List;
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     @Resource
     private PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
 
     @Override
     public boolean hasSameUsername(String username) {
@@ -81,5 +83,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changePassword(String username, String newPassword) {
         userMapper.changePassword(username,passwordEncoder.encode(newPassword));
+    }
+
+    @Override
+    public void resetEmail(String username, String email) {
+        userMapper.resetEmail(username,email);
     }
 }

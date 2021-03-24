@@ -7,7 +7,6 @@ import com.catchiz.enrollctrl.pojo.Problem;
 import com.catchiz.enrollctrl.pojo.ProblemType;
 import com.catchiz.enrollctrl.pojo.Questionnaire;
 import com.catchiz.enrollctrl.service.QuestionnaireService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,10 +15,13 @@ import java.util.List;
 @Service
 @Transactional
 public class QuestionnaireServiceImpl implements QuestionnaireService {
-    @Autowired
-    private QuestionnaireMapper questionnaireMapper;
-    @Autowired
-    private ProblemMapper problemMapper;
+    private final QuestionnaireMapper questionnaireMapper;
+    private final ProblemMapper problemMapper;
+
+    public QuestionnaireServiceImpl(QuestionnaireMapper questionnaireMapper, ProblemMapper problemMapper) {
+        this.questionnaireMapper = questionnaireMapper;
+        this.problemMapper = problemMapper;
+    }
 
     @Override
     public void insertQuestionnaire(Questionnaire questionnaire, List<Problem> problems) {

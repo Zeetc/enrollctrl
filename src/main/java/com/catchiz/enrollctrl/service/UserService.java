@@ -28,4 +28,6 @@ public interface UserService {
     void changeGender(Integer gender, String username);
 
     void changePassword(String username, String newPassword);
+
+    void resetEmail(String username, String email);
 }
