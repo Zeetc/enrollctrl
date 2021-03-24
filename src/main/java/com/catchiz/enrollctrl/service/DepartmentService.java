@@ -11,4 +11,5 @@ public interface DepartmentService {
 
     List<Department> listAllDepartment();
 
+    void addDepartment(Department department);
 }

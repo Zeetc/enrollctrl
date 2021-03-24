@@ -51,12 +51,7 @@ public class UserController {
     @GetMapping("/getInviteCode")
     @ApiOperation("生成邀请码，有效期7天")
     public CommonResult getInviteCode(@RequestHeader String Authorization){
-        String username = JwtTokenUtil.getUsernameFromToken(Authorization);
-        Integer departmentId=userService.getDepartmentIdByUsername(username);
-        ValueOperations<String, String> operations = redisTemplate.opsForValue();
-        String inviteCode = UUID.randomUUID().toString().substring(0,7);
-        operations.set(inviteCode,departmentId.toString(),7,TimeUnit.DAYS);
-        return new CommonResult(CommonStatus.CREATE,"创建成功",inviteCode);
+        return ManagerController.generateInviteCode(Authorization, userService, redisTemplate);
     }
 
     @PatchMapping("/changePassword")
@@ -143,13 +138,14 @@ public class UserController {
 
     @PatchMapping("/changeProblem")
     @ApiOperation(("修改问卷题目"))
-    public CommonResult changeProblem(Problem p,
+    public CommonResult changeProblem(@RequestBody Problem p,
                                       @RequestHeader String Authorization){
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
         User user= userService.getUserByUsername(username);
         if(user==null)return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
         Problem problem= problemService.getProblemByProblemId(p.getId());
         Questionnaire questionnaire = questionnaireService.getQuestionnaireByQuestionnaireId(problem.getQuestionnaireId());
+        if(questionnaire==null)return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
         if(!user.getDepartmentId().equals(questionnaire.getDepartmentId()))return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
         problemService.changeProblem(p);
         return new CommonResult(CommonStatus.OK,"修改成功");

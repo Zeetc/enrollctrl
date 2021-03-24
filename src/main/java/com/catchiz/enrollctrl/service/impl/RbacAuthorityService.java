@@ -31,6 +31,7 @@ public class RbacAuthorityService {
     private final StringRedisTemplate redisTemplate;
 
     public boolean hasPermission(HttpServletRequest request) {
+        //if(!referer.contains("z3117538n4.wicp.vip")&&!referer.contains("311l7b5384.goho.co")&&!referer.contains("localhost"))
         log.info("current request is:" + request.getRequestURI());
         String token = request.getHeader("Authorization");
         if(token==null||redisTemplate.opsForValue().get(token)!=null)return false;

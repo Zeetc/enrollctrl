@@ -1,10 +1,7 @@
 package com.catchiz.enrollctrl.mapper;
 
 import com.catchiz.enrollctrl.pojo.Department;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -18,4 +15,8 @@ public interface DepartmentMapper {
 
     @Select("select * from department")
     List<Department> listAllDepartment();
+
+    @Insert("insert into department values(#{id},#{name},#{describe})")
+    @Options(useGeneratedKeys = true,keyColumn = "id",keyProperty = "id")
+    void addDepartment(Department department);
 }

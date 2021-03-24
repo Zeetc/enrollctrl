@@ -211,7 +211,7 @@ public class AuthController {
 
     @PostMapping("/answerQuestions")
     @ApiOperation("提交问卷答案")
-    public CommonResult answerQuestions(List<Answer> answers,
+    public CommonResult answerQuestions(@RequestBody List<Answer> answers,
                                         @RequestHeader String Authorization){
         if(!StringUtils.hasText(Authorization))return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");
         int questionnaireId;

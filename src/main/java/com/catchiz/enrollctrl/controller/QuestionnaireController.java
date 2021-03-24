@@ -7,16 +7,13 @@ import com.catchiz.enrollctrl.service.QuestionnaireService;
 import com.catchiz.enrollctrl.service.UserService;
 import com.catchiz.enrollctrl.utils.JwtTokenUtil;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @RestController
+@RequestMapping("/question")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class QuestionnaireController {
 
     private final QuestionnaireService questionnaireService;
@@ -34,8 +31,8 @@ public class QuestionnaireController {
 
     @PostMapping("/insertQuestionnaire")
     @ApiOperation("创建问卷并提交")
-    public CommonResult insertQuestionnaire(Questionnaire questionnaire,
-                                            List<Problem> problems,
+    public CommonResult insertQuestionnaire(@RequestBody Questionnaire questionnaire,
+                                            @RequestBody List<Problem> problems,
                                             @RequestHeader String Authorization){
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
         Integer departmentId= userService.getDepartmentIdByUsername(username);
@@ -55,12 +52,6 @@ public class QuestionnaireController {
         if(questionnaire==null||!user.getDepartmentId().equals(questionnaire.getDepartmentId())){
             return new CommonResult(CommonStatus.FORBIDDEN,"无权限");
         }
-        List<Problem> problems=problemService.getProblemIdsByQuestionnaireId(questionnaireId);
-        problems.sort(Comparator.comparingInt(Problem::getIndex));
-        List<List<Answer>> lists=new ArrayList<>();
-        for (Problem problem : problems) {
-            lists.add(answerService.getAnsByProblemId(problem.getId()));
-        }
-        return new CommonResult(CommonStatus.OK,"查询成功",lists);
+        return ManagerController.getQuestionnaireAns(questionnaireId, problemService, answerService);
     }
 }

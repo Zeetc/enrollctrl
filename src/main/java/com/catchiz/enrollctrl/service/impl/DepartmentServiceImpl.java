@@ -31,4 +31,10 @@ public class DepartmentServiceImpl implements DepartmentService {
     public List<Department> listAllDepartment() {
         return departmentMapper.listAllDepartment();
     }
+
+    @Override
+    public void addDepartment(Department department) {
+        department.setId(null);
+        departmentMapper.addDepartment(department);
+    }
 }
