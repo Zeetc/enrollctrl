@@ -14,4 +14,10 @@ public interface AnswerMapper {
 
     @Select("select * from answer where problemId = #{problemId}")
     List<Answer> getAnsByProblemId(Integer id);
+
+    @Select("select author_id from answer where questionnaire_id = #{questionnaireId}")
+    List<Integer> getAllAnswerAuthor(Integer questionnaireId);
+
+    @Select("select * from answer where author_id = #{answerAuthorId}")
+    List<Answer> getAnswerByAuthor(Integer answerAuthorId);
 }

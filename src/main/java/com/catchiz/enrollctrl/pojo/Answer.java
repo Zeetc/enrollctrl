@@ -15,7 +15,8 @@ public class Answer {
     @ApiModelProperty("list类型的值，如果是多选的话需要传所有可选值")
     private List<String> val;
     @ApiModelProperty("无需传参")
-    private String author;
+    private Integer authorId;
     @ApiModelProperty("无需传参")
     private String jsonVal;
+    private Integer questionnaireId;
 }

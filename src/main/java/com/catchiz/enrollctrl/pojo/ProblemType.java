@@ -8,8 +8,9 @@ import java.util.Set;
 @Data
 public class ProblemType {
     public static Set<String> typeSet=new HashSet<String>(){
-        {add("input");}
+        {add("text");}
         {add("radio");}
         {add("checkBox");}
+        {add("multiple");}
     };
 }

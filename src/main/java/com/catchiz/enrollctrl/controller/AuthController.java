@@ -211,7 +211,7 @@ public class AuthController {
 
     @PostMapping("/answerQuestions")
     @ApiOperation("提交问卷答案")
-    public CommonResult answerQuestions(@RequestBody List<Answer> answers,
+    public CommonResult answerQuestions(@RequestBody List<Answer> answers,@RequestBody AnswerAuthor author,
                                         @RequestHeader String Authorization){
         if(!StringUtils.hasText(Authorization))return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");
         int questionnaireId;
@@ -222,7 +222,7 @@ public class AuthController {
         }catch (Exception e){
             return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
         }
-        answerService.answerQuestions(answers,questionnaireId);
+        answerService.answerQuestions(answers,questionnaireId,author);
         return new CommonResult(CommonStatus.OK,"提交成功");
     }
 }

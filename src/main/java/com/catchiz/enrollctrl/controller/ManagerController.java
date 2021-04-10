@@ -27,13 +27,14 @@ public class ManagerController {
 
     private final StringRedisTemplate redisTemplate;
 
-    public ManagerController(UserService userService, DepartmentService departmentService, ProblemService problemService, AnswerService answerService, StringRedisTemplate redisTemplate, QuestionnaireService questionnaireService) {
+    public ManagerController(UserService userService, DepartmentService departmentService, ProblemService problemService, AnswerService answerService, StringRedisTemplate redisTemplate, QuestionnaireService questionnaireService, AnswerAuthorService answerAuthorService) {
         this.userService = userService;
         this.departmentService = departmentService;
         this.problemService = problemService;
         this.answerService = answerService;
         this.redisTemplate = redisTemplate;
         this.questionnaireService = questionnaireService;
+        this.answerAuthorService = answerAuthorService;
     }
 
     @GetMapping("/getInviteCode")
@@ -117,6 +118,64 @@ public class ManagerController {
     public CommonResult listProblemsByQuestionnaireId(Integer questionnaireId){
         List<Problem> problemList=problemService.listProblemsByQuestionnaireId(questionnaireId);
         return new CommonResult(CommonStatus.OK,"查询成功",problemList);
+    }
+
+    @GetMapping("/getAllAnswerAuthor")
+    @ApiOperation(("获取回答某个问卷的所有用户以及他们的用户信息"))
+    public CommonResult getAllAnswerAuthor(Integer questionnaireId){
+        List<AnswerAuthor> answerAuthors = answerService.getAllAnswerAuthor(questionnaireId);
+        return new CommonResult(CommonStatus.OK,"获取成功",answerAuthors);
+    }
+
+    @GetMapping("/getAnswerByAuthor")
+    @ApiOperation(("获取某个回答者的回答内容"))
+    public CommonResult getAnswerByAuthor(Integer answerAuthorId){
+        List<Answer> answers = answerService.getAnswerByAuthor(answerAuthorId);
+        return new CommonResult(CommonStatus.OK,"获取成功",answers);
+    }
+
+    @GetMapping("/getSingleQuestion")
+    @ApiOperation("获取单个问题，根据Id")
+    public CommonResult getSingleQuestion(Integer problemId){
+        if(problemId ==null)return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");
+        Problem problem=problemService.getProblemByProblemId(problemId);
+        if(problem==null){
+            return new CommonResult(CommonStatus.FORBIDDEN,"无该问题");
+        }
+        return new CommonResult(CommonStatus.OK,"查询成功",problem);
+    }
+
+    @GetMapping("/sendAllUserEmail")
+    @ApiOperation("群发消息，根据问卷Id")
+    public CommonResult sendAllUserEmail(Integer questionnaireId,
+                                         String title,
+                                         String msg){
+        answerService.sendAllUserEmail(questionnaireId,title,msg);
+        return new CommonResult(CommonStatus.OK,"发送成功");
+    }
+
+    private final AnswerAuthorService answerAuthorService;
+
+    @GetMapping("/updateAnswerAuthorName")
+    @ApiOperation("修改报名信息--名字")
+    public CommonResult updateAnswerAuthorName(Integer authorId,String authorName){
+        if(authorId ==null)return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");
+        AnswerAuthor answerAuthor=answerAuthorService.getAuthorById(authorId);
+        if(answerAuthor==null){
+            return new CommonResult(CommonStatus.FORBIDDEN,"无该回答者");
+        }
+        answerAuthorService.updateAnswerAuthorName(authorId,authorName);
+        return new CommonResult(CommonStatus.OK,"修改成功");
+    }
+
+    @GetMapping("/updateAnswerAuthorEmail")
+    @ApiOperation("修改报名信息--邮箱")
+    public CommonResult updateAnswerAuthorEmail(Integer authorId,String email){
+        if(authorId ==null)return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");
+        AnswerAuthor answerAuthor=answerAuthorService.getAuthorById(authorId);
+        if(answerAuthor==null)return new CommonResult(CommonStatus.FORBIDDEN,"无权限");
+        answerAuthorService.updateAnswerAuthorEmail(authorId,email);
+        return new CommonResult(CommonStatus.OK,"修改成功");
     }
 
 
