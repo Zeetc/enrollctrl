@@ -38,17 +38,20 @@ public class ManagerController {
     }
 
     @GetMapping("/getInviteCode")
-    @ApiOperation("生成邀请码，有效期7天")
-    public CommonResult getInviteCode(@RequestHeader String Authorization){
-        return generateInviteCode(Authorization, userService, redisTemplate);
+    @ApiOperation("生成邀请码，需要指定部门Id,有效期timeOut天,有效期最大为7天")
+    public CommonResult getInviteCode(Integer departmentId,Integer timeOut){
+        ValueOperations<String, String> operations = redisTemplate.opsForValue();
+        String inviteCode = UUID.randomUUID().toString().substring(0,7);
+        operations.set(inviteCode,departmentId.toString(),timeOut, TimeUnit.DAYS);
+        return new CommonResult(CommonStatus.CREATE,"创建成功",inviteCode);
     }
 
-    static CommonResult generateInviteCode(@RequestHeader String Authorization, UserService userService, StringRedisTemplate redisTemplate) {
+    static CommonResult generateInviteCode(@RequestHeader String Authorization, UserService userService, StringRedisTemplate redisTemplate,Integer timeOut) {
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
         Integer departmentId= userService.getDepartmentIdByUsername(username);
         ValueOperations<String, String> operations = redisTemplate.opsForValue();
         String inviteCode = UUID.randomUUID().toString().substring(0,7);
-        operations.set(inviteCode,departmentId.toString(),7, TimeUnit.DAYS);
+        operations.set(inviteCode,departmentId.toString(),timeOut, TimeUnit.DAYS);
         return new CommonResult(CommonStatus.CREATE,"创建成功",inviteCode);
     }
 

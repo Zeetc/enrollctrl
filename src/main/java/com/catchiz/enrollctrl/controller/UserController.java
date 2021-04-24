@@ -50,8 +50,8 @@ public class UserController {
 
     @GetMapping("/getInviteCode")
     @ApiOperation("生成邀请码，有效期7天")
-    public CommonResult getInviteCode(@RequestHeader String Authorization){
-        return ManagerController.generateInviteCode(Authorization, userService, redisTemplate);
+    public CommonResult getInviteCode(@RequestHeader String Authorization,Integer timeOut){
+        return ManagerController.generateInviteCode(Authorization, userService, redisTemplate,timeOut);
     }
 
     @PatchMapping("/changePassword")
