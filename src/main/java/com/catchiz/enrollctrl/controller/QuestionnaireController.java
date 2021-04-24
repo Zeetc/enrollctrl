@@ -6,7 +6,7 @@ import com.catchiz.enrollctrl.utils.JwtTokenUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/question")
@@ -58,6 +58,25 @@ public class QuestionnaireController {
         if (FORBIDDEN != null) return FORBIDDEN;
         List<AnswerAuthor> answerAuthors = answerService.getAllAnswerAuthor(questionnaireId);
         return new CommonResult(CommonStatus.OK,"获取成功",answerAuthors);
+    }
+
+    @GetMapping("/compareTo")
+    @ApiOperation("指定两份问卷，对比结果，第一个list存两个问卷都有的用户，第二个list存被淘汰的用户")
+    public CommonResult compareTo(Integer first, Integer second, @RequestHeader String Authorization){
+        CommonResult FORBIDDEN1 = checkPermission(first, Authorization);
+        if (FORBIDDEN1 != null) return FORBIDDEN1;
+        CommonResult FORBIDDEN2 = checkPermission(second, Authorization);
+        if (FORBIDDEN2 != null) return FORBIDDEN2;
+        Set<AnswerAuthor> firstAnswerAuthor = new HashSet<>(answerService.getAllAnswerAuthor(first));
+        List<AnswerAuthor> secondAnswerAuthor = answerService.getAllAnswerAuthor(second);
+        List<AnswerAuthor> both = new ArrayList<>();
+        List<AnswerAuthor> reject = new ArrayList<>();
+        for (AnswerAuthor answerAuthor : secondAnswerAuthor) {
+            if(firstAnswerAuthor.contains(answerAuthor)){
+                both.add(answerAuthor);
+            }else reject.add(answerAuthor);
+        }
+        return new CommonResult(CommonStatus.OK,"获取成功", Arrays.asList(both,reject));
     }
 
     @GetMapping("/getAnswerByAuthor")

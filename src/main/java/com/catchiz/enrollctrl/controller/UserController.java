@@ -49,7 +49,7 @@ public class UserController {
 
 
     @GetMapping("/getInviteCode")
-    @ApiOperation("生成邀请码，有效期7天")
+    @ApiOperation("生成邀请码，有效期timeOut天")
     public CommonResult getInviteCode(@RequestHeader String Authorization,Integer timeOut){
         return ManagerController.generateInviteCode(Authorization, userService, redisTemplate,timeOut);
     }

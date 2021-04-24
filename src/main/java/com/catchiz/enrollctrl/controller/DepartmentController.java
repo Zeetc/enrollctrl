@@ -22,19 +22,6 @@ public class DepartmentController {
         this.userService = userService;
     }
 
-    @PatchMapping("/changeDepartmentName")
-    @ApiOperation("更改部门名字")
-    public CommonResult changeDepartmentName(Integer departmentId,String name,
-                                             @RequestHeader String Authorization){
-        String username = JwtTokenUtil.getUsernameFromToken(Authorization);
-        User user= userService.getUserByUsername(username);
-        if(!user.getDepartmentId().equals(departmentId)){
-            return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
-        }
-        departmentService.changeDepartmentName(departmentId,name);
-        return new CommonResult(CommonStatus.OK,"修改成功");
-    }
-
     @PatchMapping("/changeDepartmentDescribe")
     @ApiOperation("更改部门描述")
     public CommonResult changeDepartmentDescribe(Integer departmentId,String describe,
