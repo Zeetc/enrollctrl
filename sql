@@ -19,9 +19,9 @@ create table enrollctrl.answer_author
 
 create table enrollctrl.department
 (
-    id         int          not null,
-    name       varchar(50)  not null,
-    `describe` varchar(255) null,
+    id        int          not null,
+    name      varchar(50)  not null,
+    describes varchar(255) null,
     constraint department_id_uindex
         unique (id)
 );
@@ -36,7 +36,7 @@ create table enrollctrl.problem
     title           varchar(255) not null,
     type            varchar(50)  not null,
     jsonVal         varchar(255) null,
-    `index`         int          not null,
+    idx             int          not null,
     questionnaireId int          not null
 );
 
@@ -45,7 +45,7 @@ create table enrollctrl.questionnaire
     id           int auto_increment,
     departmentId int          not null,
     title        varchar(128) not null,
-    `describe`   varchar(255) null,
+    describes    varchar(255) null,
     constraint questionnaire_id_uindex
         unique (id)
 );
@@ -62,7 +62,7 @@ create table enrollctrl.user
     isManager    bit          not null,
     departmentId int          not null,
     registerDate datetime     not null,
-    `describe`   varchar(255) null,
+    describes    varchar(255) null,
     constraint user_username_uindex
         unique (username)
 );

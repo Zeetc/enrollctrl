@@ -35,7 +35,7 @@ public interface UserMapper {
     @Update("update user set username = #{name} where username = #{username}")
     void changeUsername(@Param("name") String name, @Param("username") String username);
 
-    @Update("update user set describe = #{describe} where username = #{username}")
+    @Update("update user set describes = #{describe} where username = #{username}")
     void changeDescribe(@Param("describe") String describe, @Param("username") String username);
 
     @Update("update user set gender = #{gender} where username = #{username}")
