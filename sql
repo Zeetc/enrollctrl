@@ -1,7 +1,7 @@
 create database enrollctrl;
 use enrollctrl;
 
-create table answer
+create table enrollctrl.answer
 (
     problemId        int          not null,
     jsonVal          varchar(255) null,
@@ -9,7 +9,7 @@ create table answer
     questionnaire_id int          null
 );
 
-create table answer_author
+create table enrollctrl.answer_author
 (
     author_id    int auto_increment
         primary key,
@@ -17,7 +17,7 @@ create table answer_author
     author_email varchar(80) null
 );
 
-create table department
+create table enrollctrl.department
 (
     id         int          not null,
     name       varchar(50)  not null,
@@ -26,10 +26,10 @@ create table department
         unique (id)
 );
 
-alter table department
+alter table enrollctrl.department
     add primary key (id);
 
-create table problem
+create table enrollctrl.problem
 (
     id              int auto_increment
         primary key,
@@ -40,7 +40,7 @@ create table problem
     questionnaireId int          not null
 );
 
-create table questionnaire
+create table enrollctrl.questionnaire
 (
     id           int auto_increment,
     departmentId int          not null,
@@ -50,10 +50,10 @@ create table questionnaire
         unique (id)
 );
 
-alter table questionnaire
+alter table enrollctrl.questionnaire
     add primary key (id);
 
-create table user
+create table enrollctrl.user
 (
     username     varchar(50)  not null,
     password     varchar(128) not null,
@@ -67,6 +67,6 @@ create table user
         unique (username)
 );
 
-alter table user
+alter table enrollctrl.user
     add primary key (username);
 
