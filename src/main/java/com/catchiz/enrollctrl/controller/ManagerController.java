@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -27,7 +29,7 @@ public class ManagerController {
 
     private final StringRedisTemplate redisTemplate;
 
-    public ManagerController(UserService userService, DepartmentService departmentService, ProblemService problemService, AnswerService answerService, StringRedisTemplate redisTemplate, QuestionnaireService questionnaireService, AnswerAuthorService answerAuthorService) {
+    public ManagerController(UserService userService, DepartmentService departmentService, ProblemService problemService, AnswerService answerService, StringRedisTemplate redisTemplate, QuestionnaireService questionnaireService, AnswerAuthorService answerAuthorService, ThreadPoolExecutor executor) {
         this.userService = userService;
         this.departmentService = departmentService;
         this.problemService = problemService;
@@ -35,6 +37,7 @@ public class ManagerController {
         this.redisTemplate = redisTemplate;
         this.questionnaireService = questionnaireService;
         this.answerAuthorService = answerAuthorService;
+        this.executor = executor;
     }
 
     @GetMapping("/getInviteCode")
@@ -148,12 +151,14 @@ public class ManagerController {
         return new CommonResult(CommonStatus.OK,"查询成功",problem);
     }
 
+    private final ThreadPoolExecutor executor;
+
     @GetMapping("/sendAllUserEmail")
     @ApiOperation("群发消息，根据问卷Id")
     public CommonResult sendAllUserEmail(Integer questionnaireId,
                                          String title,
                                          String msg){
-        answerService.sendAllUserEmail(questionnaireId,title,msg);
+        CompletableFuture.runAsync(()-> answerService.sendAllUserEmail(questionnaireId,title,msg),executor);
         return new CommonResult(CommonStatus.OK,"发送成功");
     }
 

@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @RestController
 @RequestMapping("/question")
@@ -21,12 +23,13 @@ public class QuestionnaireController {
 
     private final AnswerAuthorService answerAuthorService;
 
-    public QuestionnaireController(QuestionnaireService questionnaireService, UserService userService, ProblemService problemService, AnswerService answerService, AnswerAuthorService answerAuthorService) {
+    public QuestionnaireController(QuestionnaireService questionnaireService, UserService userService, ProblemService problemService, AnswerService answerService, AnswerAuthorService answerAuthorService, ThreadPoolExecutor executor) {
         this.questionnaireService = questionnaireService;
         this.userService = userService;
         this.problemService = problemService;
         this.answerService = answerService;
         this.answerAuthorService = answerAuthorService;
+        this.executor = executor;
     }
 
     @PostMapping("/insertQuestionnaire")
@@ -104,6 +107,8 @@ public class QuestionnaireController {
         return new CommonResult(CommonStatus.OK,"查询成功",problem);
     }
 
+    private final ThreadPoolExecutor executor;
+
     @GetMapping("/sendAllUserEmail")
     @ApiOperation("群发消息，根据问卷Id")
     public CommonResult sendAllUserEmail(Integer questionnaireId,
@@ -112,7 +117,7 @@ public class QuestionnaireController {
                                          @RequestHeader String Authorization){
         CommonResult FORBIDDEN = checkPermission(questionnaireId, Authorization);
         if (FORBIDDEN != null) return FORBIDDEN;
-        answerService.sendAllUserEmail(questionnaireId,title,msg);
+        CompletableFuture.runAsync(()-> answerService.sendAllUserEmail(questionnaireId,title,msg),executor);
         return new CommonResult(CommonStatus.OK,"发送成功");
     }
 

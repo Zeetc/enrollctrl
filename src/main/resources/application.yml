@@ -26,6 +26,13 @@ server:
   tomcat:
     uri-encoding: UTF-8
 
+# 自定义线程池参数
+enrollctrl:
+  thread:
+    corePoolSize: 10
+    maxPoolSize: 20
+    keepAliveTime: 300
+
 logging:
   level:
     com.catchiz.enrollctrl.mapper: debug

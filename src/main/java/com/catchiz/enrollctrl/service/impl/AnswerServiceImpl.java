@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Service
 @Slf4j
@@ -29,11 +31,12 @@ public class AnswerServiceImpl implements AnswerService {
     @Value("${spring.mail.username}")
     private String emailSendUser;
 
-    public AnswerServiceImpl(AnswerMapper answerMapper, ProblemService problemService, AnswerAuthorService answerAuthorService, JavaMailSender mailSender) {
+    public AnswerServiceImpl(AnswerMapper answerMapper, ProblemService problemService, AnswerAuthorService answerAuthorService, JavaMailSender mailSender, ThreadPoolExecutor executor) {
         this.answerMapper = answerMapper;
         this.problemService = problemService;
         this.answerAuthorService = answerAuthorService;
         this.mailSender = mailSender;
+        this.executor = executor;
     }
 
     @Override
@@ -74,21 +77,24 @@ public class AnswerServiceImpl implements AnswerService {
         }
         return answers;
     }
+    private final ThreadPoolExecutor executor;
 
     @Override
     public void sendAllUserEmail(Integer questionnaireId,String title, String msg) {
         List<AnswerAuthor> answerAuthors = this.getAllAnswerAuthor(questionnaireId);
         for (AnswerAuthor answerAuthor : answerAuthors) {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(emailSendUser);
-            message.setTo(answerAuthor.getAuthorEmail());
-            message.setSubject(title);
-            message.setText(msg);
-            try {
-                mailSender.send(message);
-            } catch (Exception e) {
-                log.error("尝试发送消息失败");
-            }
+            CompletableFuture.runAsync(()->{
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setFrom(emailSendUser);
+                message.setTo(answerAuthor.getAuthorEmail());
+                message.setSubject(title);
+                message.setText(msg);
+                try {
+                    mailSender.send(message);
+                } catch (Exception e) {
+                    log.error("尝试发送消息失败");
+                }
+            },executor);
         }
     }
 }
