@@ -4,7 +4,6 @@ import com.catchiz.enrollctrl.pojo.*;
 import com.catchiz.enrollctrl.service.*;
 import com.catchiz.enrollctrl.utils.JwtTokenUtil;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;

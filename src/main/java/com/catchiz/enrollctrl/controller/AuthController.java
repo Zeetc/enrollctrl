@@ -55,7 +55,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ApiOperation("用户登录，需要邀请码，同时需要输入验证码")
-    public CommonResult register(@Validated({RegisterGroup.class}) User user, Integer inviteCode, String inputVerify,
+    public CommonResult register(@Validated({RegisterGroup.class}) User user, String inviteCode, String inputVerify,
                                  @RequestHeader String Authorization){
         ValueOperations<String, String> operations = redisTemplate.opsForValue();
         String verifyCode = operations.get(Authorization);
@@ -63,7 +63,7 @@ public class AuthController {
             return new CommonResult(CommonStatus.FORBIDDEN,"验证码输入错误");
         }
         String inviteGroupId = operations.get(inviteCode);
-        if(!StringUtils.hasText(inviteGroupId))return new CommonResult(CommonStatus.NOTFOUND,"验证码无效或者已过期");
+        if(!StringUtils.hasText(inviteGroupId))return new CommonResult(CommonStatus.NOTFOUND,"邀请码无效或者已过期");
         if(userService.hasSameUsername(user.getUsername()))return new CommonResult(CommonStatus.FORBIDDEN,"该用户名已被注册");
         user.setIsManager(false);
         user.setDepartmentId(Integer.parseInt(inviteGroupId));
@@ -92,7 +92,7 @@ public class AuthController {
             randomCode.append(strRand);
         }
         ValueOperations<String, String> operations = redisTemplate.opsForValue();
-        operations.set(uuid, randomCode.toString(), 1, TimeUnit.MINUTES);
+        operations.set(uuid, randomCode.toString(), 10, TimeUnit.MINUTES);
         System.out.println(redisTemplate.opsForValue().get(uuid));
         return new CommonResult(CommonStatus.OK, "获得成功", uuid);
     }

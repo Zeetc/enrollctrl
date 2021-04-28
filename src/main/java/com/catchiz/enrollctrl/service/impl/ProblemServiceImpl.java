@@ -34,7 +34,7 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public List<Problem> getProblemIdsByQuestionnaireId(Integer questionnaireId) {
-        return problemMapper.getProblemIdsByQuestionnaireId(questionnaireId);
+        return problemMapper.getProblemsByQuestionnaireId(questionnaireId);
     }
 
     @Override

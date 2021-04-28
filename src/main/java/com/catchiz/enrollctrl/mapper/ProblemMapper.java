@@ -19,8 +19,8 @@ public interface ProblemMapper {
     @Select("select * from problem where id = #{problemId}")
     Problem getProblemByProblemId(Integer problemId);
 
-    @Select("select * from question where questionnaireId = #{questionnaireId}")
-    List<Problem> getProblemIdsByQuestionnaireId(Integer questionnaireId);
+    @Select("select * from problem where questionnaireId = #{questionnaireId}")
+    List<Problem> getProblemsByQuestionnaireId(Integer questionnaireId);
 
     @Update("update problem set title = #{title} and type = #{type} and #{jsonVal} = #{jsonVal} where id = #{id}")
     void changeProblem(Problem p);

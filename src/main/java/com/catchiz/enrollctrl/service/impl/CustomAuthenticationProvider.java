@@ -69,7 +69,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String code=operations.get(uuid);
         if(code==null)return false;
         boolean flag=inputVerify.equalsIgnoreCase(code);
-        redisTemplate.delete(code);
+        if(flag)redisTemplate.delete(code);
         return flag;
     }
 

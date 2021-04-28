@@ -12,6 +12,6 @@ public interface QuestionnaireMapper {
     @Options(useGeneratedKeys = true,keyColumn = "id",keyProperty = "id")
     void insertQuestionnaire(Questionnaire questionnaire);
 
-    @Select("select * from questionnaire where questionnaireId = #{questionnaireId}")
+    @Select("select * from questionnaire where id = #{questionnaireId}")
     Questionnaire getQuestionnaireByQuestionnaireId(Integer questionnaireId);
 }
