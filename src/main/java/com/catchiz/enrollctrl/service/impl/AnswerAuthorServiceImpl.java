@@ -5,6 +5,8 @@ import com.catchiz.enrollctrl.pojo.AnswerAuthor;
 import com.catchiz.enrollctrl.service.AnswerAuthorService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AnswerAuthorServiceImpl implements AnswerAuthorService {
     private final AnswerAuthorMapper answerAuthorMapper;
@@ -32,5 +34,20 @@ public class AnswerAuthorServiceImpl implements AnswerAuthorService {
     @Override
     public void updateAnswerAuthorEmail(Integer authorId, String email) {
         answerAuthorMapper.updateAnswerAuthorEmail(authorId,email);
+    }
+
+    @Override
+    public void setIsPass(Integer authorId, Integer isPass) {
+        answerAuthorMapper.setIsPass(authorId,isPass);
+    }
+
+    @Override
+    public List<AnswerAuthor> getAllUserIsPass(Integer questionnaireId) {
+        return answerAuthorMapper.getAllUserIsPass(questionnaireId);
+    }
+
+    @Override
+    public List<AnswerAuthor> getAllAnswerAuthor(Integer questionnaireId) {
+        return answerAuthorMapper.getAllUserByQuestionnaireId(questionnaireId);
     }
 }

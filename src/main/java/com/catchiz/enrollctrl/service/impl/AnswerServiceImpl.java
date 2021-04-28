@@ -81,7 +81,26 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public void sendAllUserEmail(Integer questionnaireId,String title, String msg) {
-        List<AnswerAuthor> answerAuthors = this.getAllAnswerAuthor(questionnaireId);
+        List<AnswerAuthor> answerAuthors = answerAuthorService.getAllAnswerAuthor(questionnaireId);
+        for (AnswerAuthor answerAuthor : answerAuthors) {
+            CompletableFuture.runAsync(()->{
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setFrom(emailSendUser);
+                message.setTo(answerAuthor.getAuthorEmail());
+                message.setSubject(title);
+                message.setText(msg);
+                try {
+                    mailSender.send(message);
+                } catch (Exception e) {
+                    log.error("尝试发送消息失败");
+                }
+            },executor);
+        }
+    }
+
+    @Override
+    public void sendAllUserEmailIsPass(Integer questionnaireId, String title, String msg) {
+        List<AnswerAuthor> answerAuthors = answerAuthorService.getAllUserIsPass(questionnaireId);
         for (AnswerAuthor answerAuthor : answerAuthors) {
             CompletableFuture.runAsync(()->{
                 SimpleMailMessage message = new SimpleMailMessage();

@@ -9,6 +9,8 @@ public class AnswerAuthor {
     private Integer authorId;
     private String authorName;
     private String authorEmail;
+    private Integer isPass;
+    private Integer questionnaireId;
 
     @Override
     public boolean equals(Object o) {

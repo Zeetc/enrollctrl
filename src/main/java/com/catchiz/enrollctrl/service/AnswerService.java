@@ -15,4 +15,6 @@ public interface AnswerService {
     List<Answer> getAnswerByAuthor(Integer answerAuthorId);
 
     void sendAllUserEmail(Integer questionnaireId, String title,String msg);
+
+    void sendAllUserEmailIsPass(Integer questionnaireId, String title, String msg);
 }

@@ -4,6 +4,7 @@ import com.catchiz.enrollctrl.pojo.*;
 import com.catchiz.enrollctrl.service.*;
 import com.catchiz.enrollctrl.utils.JwtTokenUtil;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -121,7 +122,18 @@ public class QuestionnaireController {
         return new CommonResult(CommonStatus.OK,"发送成功");
     }
 
-    @GetMapping("/updateAnswerAuthorName")
+    @GetMapping("/sendAllUserEmailIsPass")
+    public CommonResult sendAllUserEmailIsPass(Integer questionnaireId,
+                                         String title,
+                                         String msg,
+                                         @RequestHeader String Authorization){
+        CommonResult FORBIDDEN = checkPermission(questionnaireId, Authorization);
+        if (FORBIDDEN != null) return FORBIDDEN;
+        CompletableFuture.runAsync(()-> answerService.sendAllUserEmailIsPass(questionnaireId,title,msg),executor);
+        return new CommonResult(CommonStatus.OK,"发送成功");
+    }
+
+    @PatchMapping("/updateAnswerAuthorName")
     @ApiOperation("修改报名信息--名字")
     public CommonResult updateAnswerAuthorName(Integer authorId,String authorName,
                                                @RequestHeader String Authorization){
@@ -137,7 +149,7 @@ public class QuestionnaireController {
         return new CommonResult(CommonStatus.OK,"修改成功");
     }
 
-    @GetMapping("/updateAnswerAuthorEmail")
+    @PatchMapping("/updateAnswerAuthorEmail")
     @ApiOperation("修改报名信息--邮箱")
     public CommonResult updateAnswerAuthorEmail(Integer authorId,String email,
                                                @RequestHeader String Authorization){
@@ -147,6 +159,16 @@ public class QuestionnaireController {
         AnswerAuthor answerAuthor=answerAuthorService.getAuthorById(authorId);
         if(user==null||answerAuthor==null)return new CommonResult(CommonStatus.FORBIDDEN,"无权限");
         answerAuthorService.updateAnswerAuthorEmail(authorId,email);
+        return new CommonResult(CommonStatus.OK,"修改成功");
+    }
+
+    @PatchMapping("/setIsPass")
+    public CommonResult setIsPass(Integer authorId, Integer isPass,@RequestHeader String Authorization){
+        AnswerAuthor author = answerAuthorService.getAuthorById(authorId);
+        if(author==null)return new CommonResult(CommonStatus.NOTFOUND,"未找到该回答作者");
+        CommonResult FORBIDDEN = checkPermission(author.getQuestionnaireId(), Authorization);
+        if (FORBIDDEN != null) return FORBIDDEN;
+        answerAuthorService.setIsPass(authorId,isPass);
         return new CommonResult(CommonStatus.OK,"修改成功");
     }
 

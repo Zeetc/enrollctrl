@@ -8,10 +8,12 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.mapstruct.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface AnswerAuthorMapper {
 
-    @Insert("insert into answer_author values(#{authorId},#{authorName},#{authorEmail})")
+    @Insert("insert into answer_author values(#{authorId},#{authorName},#{authorEmail},#{isPass}),#{questionnaireId}")
     @Options(useGeneratedKeys = true,keyColumn = "author_id",keyProperty = "authorId")
     void saveAuthor(AnswerAuthor author);
 
@@ -23,4 +25,14 @@ public interface AnswerAuthorMapper {
 
     @Update("update answer_author set author_email = #{email} where author_id = #{authorId}")
     void updateAnswerAuthorEmail(@Param("authorId") Integer authorId, @Param("email") String email);
+
+    @Update("update answer_author set is_pass = #{isPass} where author_id = #{authorId}")
+    void setIsPass(@Param("authorId") Integer authorId,@Param("isPass")Integer isPass);
+
+    @Select("select * from answer_author where questionnaireId = #{questionnaireId} and is_pass = 1")
+    List<AnswerAuthor> getAllUserIsPass(Integer questionnaireId);
+
+    @Select("select * from answer_author where questionnaireId = #{questionnaireId}")
+    List<AnswerAuthor> getAllUserByQuestionnaireId(Integer questionnaireId);
+
 }

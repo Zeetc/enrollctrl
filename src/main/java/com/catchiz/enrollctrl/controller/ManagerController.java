@@ -164,7 +164,7 @@ public class ManagerController {
 
     private final AnswerAuthorService answerAuthorService;
 
-    @GetMapping("/updateAnswerAuthorName")
+    @PatchMapping("/updateAnswerAuthorName")
     @ApiOperation("修改报名信息--名字")
     public CommonResult updateAnswerAuthorName(Integer authorId,String authorName){
         if(authorId ==null)return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");
@@ -176,7 +176,7 @@ public class ManagerController {
         return new CommonResult(CommonStatus.OK,"修改成功");
     }
 
-    @GetMapping("/updateAnswerAuthorEmail")
+    @PatchMapping("/updateAnswerAuthorEmail")
     @ApiOperation("修改报名信息--邮箱")
     public CommonResult updateAnswerAuthorEmail(Integer authorId,String email){
         if(authorId ==null)return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");
