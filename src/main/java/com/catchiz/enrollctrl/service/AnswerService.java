@@ -17,4 +17,6 @@ public interface AnswerService {
     void sendAllUserEmail(Integer questionnaireId, String title,String msg);
 
     void sendAllUserEmailIsPass(Integer questionnaireId, String title, String msg);
+
+    void deleteQuestionnaire(Integer questionnaireId);
 }

@@ -30,4 +30,6 @@ public interface UserService {
     void changePassword(String username, String newPassword);
 
     void resetEmail(String username, String email);
+
+    List<User> listAllUserByDepartmentId(Integer departmentId);
 }

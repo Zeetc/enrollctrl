@@ -19,4 +19,6 @@ public interface AnswerAuthorService {
     List<AnswerAuthor> getAllUserIsPass(Integer questionnaireId);
 
     List<AnswerAuthor> getAllAnswerAuthor(Integer questionnaireId);
+
+    void deleteQuestionnaire(Integer questionnaireId);
 }

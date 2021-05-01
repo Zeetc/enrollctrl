@@ -46,4 +46,7 @@ public interface UserMapper {
 
     @Update("update user set email = {email} where username = #{username}")
     void resetEmail(@Param("username") String username, @Param("email") String email);
+
+    @Select("select * from user where departmentId = #{departmentId}")
+    List<User> listAllUserByDepartmentId(Integer departmentId);
 }

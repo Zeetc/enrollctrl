@@ -72,6 +72,14 @@ public class ManagerController {
         return new CommonResult(CommonStatus.OK,"查询成功",userList);
     }
 
+    @GetMapping("/listAllUserByDepartmentId")
+    @ApiOperation("获取指定部门用户")
+    public CommonResult listAllUserByDepartmentId(Integer departmentId){
+        if(departmentId==null)return new CommonResult(CommonStatus.FORBIDDEN, "参数不合法");
+        List<User> userList=userService.listAllUserByDepartmentId(departmentId);
+        return new CommonResult(CommonStatus.OK,"查询成功",userList);
+    }
+
     @GetMapping("/listAllDepartment")
     @ApiOperation("获取所有部门")
     public CommonResult listAllDepartment(){

@@ -162,6 +162,7 @@ public class QuestionnaireController {
     }
 
     @PatchMapping("/setIsPass")
+    @ApiOperation("将某个考核成员设置成通过")
     public CommonResult setIsPass(Integer authorId, Integer isPass,@RequestHeader String Authorization){
         AnswerAuthor author = answerAuthorService.getAuthorById(authorId);
         if(author==null)return new CommonResult(CommonStatus.NOTFOUND,"未找到该回答作者");
@@ -169,6 +170,15 @@ public class QuestionnaireController {
         if (FORBIDDEN != null) return FORBIDDEN;
         answerAuthorService.setIsPass(authorId,isPass);
         return new CommonResult(CommonStatus.OK,"修改成功");
+    }
+
+    @DeleteMapping("/deleteQuestionnaire")
+    @ApiOperation("删除问卷，同时会删除问卷的所有答卷，以及回答者的信息")
+    public CommonResult deleteQuestionnaire(Integer questionnaireId, String Authorization){
+        CommonResult FORBIDDEN = checkPermission(questionnaireId, Authorization);
+        if (FORBIDDEN != null) return FORBIDDEN;
+        questionnaireService.deleteQuestionnaire(questionnaireId);
+        return new CommonResult(CommonStatus.OK,"删除成功");
     }
 
     private CommonResult checkPermission(Integer questionnaireId, String Authorization) {

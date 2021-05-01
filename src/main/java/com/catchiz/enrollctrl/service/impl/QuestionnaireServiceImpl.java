@@ -6,7 +6,10 @@ import com.catchiz.enrollctrl.mapper.QuestionnaireMapper;
 import com.catchiz.enrollctrl.pojo.Problem;
 import com.catchiz.enrollctrl.pojo.ProblemType;
 import com.catchiz.enrollctrl.pojo.Questionnaire;
+import com.catchiz.enrollctrl.service.AnswerAuthorService;
+import com.catchiz.enrollctrl.service.AnswerService;
 import com.catchiz.enrollctrl.service.QuestionnaireService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,11 @@ import java.util.List;
 public class QuestionnaireServiceImpl implements QuestionnaireService {
     private final QuestionnaireMapper questionnaireMapper;
     private final ProblemMapper problemMapper;
+    @Autowired
+    private AnswerAuthorService answerAuthorService;
+    @Autowired
+    private AnswerService answerService;
+
 
     public QuestionnaireServiceImpl(QuestionnaireMapper questionnaireMapper, ProblemMapper problemMapper) {
         this.questionnaireMapper = questionnaireMapper;
@@ -41,5 +49,13 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     @Override
     public Questionnaire getQuestionnaireByQuestionnaireId(Integer questionnaireId) {
         return questionnaireMapper.getQuestionnaireByQuestionnaireId(questionnaireId);
+    }
+
+    @Transactional
+    @Override
+    public void deleteQuestionnaire(Integer questionnaireId) {
+        questionnaireMapper.deleteQuestionnaire(questionnaireId);
+        answerAuthorService.deleteQuestionnaire(questionnaireId);
+        answerService.deleteQuestionnaire(questionnaireId);
     }
 }

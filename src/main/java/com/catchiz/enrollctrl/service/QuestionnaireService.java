@@ -9,4 +9,6 @@ public interface QuestionnaireService {
     void insertQuestionnaire(Questionnaire questionnaire, List<Problem> problems);
 
     Questionnaire getQuestionnaireByQuestionnaireId(Integer questionnaireId);
+
+    void deleteQuestionnaire(Integer questionnaireId);
 }

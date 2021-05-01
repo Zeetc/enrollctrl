@@ -89,4 +89,9 @@ public class UserServiceImpl implements UserService {
     public void resetEmail(String username, String email) {
         userMapper.resetEmail(username,email);
     }
+
+    @Override
+    public List<User> listAllUserByDepartmentId(Integer departmentId) {
+        return userMapper.listAllUserByDepartmentId(departmentId);
+    }
 }

@@ -50,4 +50,9 @@ public class AnswerAuthorServiceImpl implements AnswerAuthorService {
     public List<AnswerAuthor> getAllAnswerAuthor(Integer questionnaireId) {
         return answerAuthorMapper.getAllUserByQuestionnaireId(questionnaireId);
     }
+
+    @Override
+    public void deleteQuestionnaire(Integer questionnaireId) {
+        answerAuthorMapper.deleteQuestionnaire(questionnaireId);
+    }
 }

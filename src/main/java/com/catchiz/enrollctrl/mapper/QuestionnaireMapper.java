@@ -1,10 +1,7 @@
 package com.catchiz.enrollctrl.mapper;
 
 import com.catchiz.enrollctrl.pojo.Questionnaire;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface QuestionnaireMapper {
@@ -14,4 +11,7 @@ public interface QuestionnaireMapper {
 
     @Select("select * from questionnaire where id = #{questionnaireId}")
     Questionnaire getQuestionnaireByQuestionnaireId(Integer questionnaireId);
+
+    @Delete("delete from questionnaire where id = #{questionnaireId}")
+    void deleteQuestionnaire(Integer questionnaireId);
 }

@@ -116,4 +116,9 @@ public class AnswerServiceImpl implements AnswerService {
             },executor);
         }
     }
+
+    @Override
+    public void deleteQuestionnaire(Integer questionnaireId) {
+        answerMapper.deleteQuestionnaire(questionnaireId);
+    }
 }

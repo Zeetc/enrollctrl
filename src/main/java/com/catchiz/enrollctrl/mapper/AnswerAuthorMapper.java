@@ -1,11 +1,7 @@
 package com.catchiz.enrollctrl.mapper;
 
 import com.catchiz.enrollctrl.pojo.AnswerAuthor;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -35,4 +31,6 @@ public interface AnswerAuthorMapper {
     @Select("select * from answer_author where questionnaireId = #{questionnaireId}")
     List<AnswerAuthor> getAllUserByQuestionnaireId(Integer questionnaireId);
 
+    @Delete("delete from answer_author where questionnaireId = #{questionnaireId}")
+    void deleteQuestionnaire(Integer questionnaireId);
 }
