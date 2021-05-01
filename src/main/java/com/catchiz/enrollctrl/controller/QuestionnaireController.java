@@ -6,6 +6,7 @@ import com.catchiz.enrollctrl.utils.JwtTokenUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -178,6 +179,26 @@ public class QuestionnaireController {
         CommonResult FORBIDDEN = checkPermission(questionnaireId, Authorization);
         if (FORBIDDEN != null) return FORBIDDEN;
         questionnaireService.deleteQuestionnaire(questionnaireId);
+        return new CommonResult(CommonStatus.OK,"删除成功");
+    }
+
+    @PatchMapping("/changeEndDate")
+    @ApiOperation("修改问卷截止时间")
+    public CommonResult changeEndDate(Integer questionnaireId, Timestamp endDate, String Authorization){
+        CommonResult FORBIDDEN = checkPermission(questionnaireId, Authorization);
+        if (FORBIDDEN != null) return FORBIDDEN;
+        questionnaireService.changeEndDate(questionnaireId, endDate);
+        return new CommonResult(CommonStatus.OK,"删除成功");
+    }
+
+    @DeleteMapping("/deleteAuthor")
+    @ApiOperation("删除作答用户，同时删除作答记录")
+    public CommonResult deleteAuthor(Integer authorId, @RequestHeader String Authorization){
+        AnswerAuthor answerAuthor = answerAuthorService.getAuthorById(authorId);
+        if(answerAuthor == null)return new CommonResult(CommonStatus.NOTFOUND,"未找到作答用户");
+        CommonResult FORBIDDEN = checkPermission(answerAuthor.getQuestionnaireId(), Authorization);
+        if (FORBIDDEN != null) return FORBIDDEN;
+        answerAuthorService.deleteAuthor(authorId);
         return new CommonResult(CommonStatus.OK,"删除成功");
     }
 

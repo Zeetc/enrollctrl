@@ -1,7 +1,6 @@
 package com.catchiz.enrollctrl.service;
 
 import com.catchiz.enrollctrl.pojo.AnswerAuthor;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,4 +20,6 @@ public interface AnswerAuthorService {
     List<AnswerAuthor> getAllAnswerAuthor(Integer questionnaireId);
 
     void deleteQuestionnaire(Integer questionnaireId);
+
+    void deleteAuthor(Integer authorId);
 }

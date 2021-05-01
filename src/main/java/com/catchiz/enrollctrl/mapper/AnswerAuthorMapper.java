@@ -33,4 +33,7 @@ public interface AnswerAuthorMapper {
 
     @Delete("delete from answer_author where questionnaireId = #{questionnaireId}")
     void deleteQuestionnaire(Integer questionnaireId);
+
+    @Delete("delete from answer_author where author_id = #{author_id}")
+    void deleteAuthor(Integer authorId);
 }

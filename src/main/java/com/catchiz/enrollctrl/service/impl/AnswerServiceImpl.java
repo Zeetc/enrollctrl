@@ -121,4 +121,9 @@ public class AnswerServiceImpl implements AnswerService {
     public void deleteQuestionnaire(Integer questionnaireId) {
         answerMapper.deleteQuestionnaire(questionnaireId);
     }
+
+    @Override
+    public void deleteAuthor(Integer authorId) {
+        answerMapper.deleteAuthor(authorId);
+    }
 }

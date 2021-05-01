@@ -200,9 +200,14 @@ public class AuthController {
     @GetMapping("/getQuestionnaire")
     @ApiOperation("获取问卷题目，供游客进行直接答题")
     public CommonResult getQuestionnaire(Integer questionnaireId){
-        if(questionnaireId==null||questionnaireService.getQuestionnaireByQuestionnaireId(questionnaireId)==null){
+        if(questionnaireId==null){
             return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
         }
+        Questionnaire questionnaireByQuestionnaireId = questionnaireService.getQuestionnaireByQuestionnaireId(questionnaireId);
+        if(questionnaireByQuestionnaireId==null)return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
+        Timestamp cur = new Timestamp(System.currentTimeMillis());
+        Timestamp endDate = questionnaireByQuestionnaireId.getEndDate();
+        if(cur.after(endDate))return new CommonResult(CommonStatus.FORBIDDEN,"问卷已经截止");
         List<Problem> problemList=problemService.listProblemsByQuestionnaireId(questionnaireId);
         String uuid=UUID.randomUUID().toString();
         redisTemplate.opsForValue().set(uuid,questionnaireId.toString(),1,TimeUnit.DAYS);
