@@ -65,7 +65,6 @@ public class AuthController {
         String inviteGroupId = operations.get(inviteCode);
         if(!StringUtils.hasText(inviteGroupId))return new CommonResult(CommonStatus.NOTFOUND,"邀请码无效或者已过期");
         if(userService.hasSameUsername(user.getUsername()))return new CommonResult(CommonStatus.FORBIDDEN,"该用户名已被注册");
-        user.setIsManager(false);
         user.setDepartmentId(Integer.parseInt(inviteGroupId));
         user.setRegisterDate(new Timestamp(System.currentTimeMillis()));
         if(!StringUtils.hasText(user.getDescribe())){
@@ -87,7 +86,7 @@ public class AuthController {
         Random random = new Random();
         for (int i = 0; i < 4; i++) {
             // 得到随机产生的验证码数字。
-            String strRand = String.valueOf(codeSequence[random.nextInt(36)]);
+            String strRand = String.valueOf(codeSequence[random.nextInt(34)]);
             // 将产生的四个随机数组合在一起。
             randomCode.append(strRand);
         }

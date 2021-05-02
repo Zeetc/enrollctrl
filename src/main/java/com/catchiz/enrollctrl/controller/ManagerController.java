@@ -6,6 +6,7 @@ import com.catchiz.enrollctrl.utils.JwtTokenUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/manager")
+@PreAuthorize(value = "hasAuthority('manager')")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class ManagerController {
     private final UserService userService;

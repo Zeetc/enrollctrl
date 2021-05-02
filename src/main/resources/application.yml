@@ -21,6 +21,10 @@ spring:
   profiles:
     active: prop
 
+mybatis:
+  configuration:
+    mapUnderscoreToCamelCase: true # 开启驼峰命名转换法
+
 server:
   port: 8888
   tomcat:

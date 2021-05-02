@@ -7,6 +7,7 @@ import com.catchiz.enrollctrl.service.DepartmentService;
 import com.catchiz.enrollctrl.service.UserService;
 import com.catchiz.enrollctrl.utils.JwtTokenUtil;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,6 +25,7 @@ public class DepartmentController {
 
     @PatchMapping("/changeDepartmentDescribe")
     @ApiOperation("更改部门描述")
+    @PreAuthorize(value = "hasAnyAuthority('manager','changeDeptName')")
     public CommonResult changeDepartmentDescribe(Integer departmentId,String describe,
                                                  @RequestHeader String Authorization){
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);

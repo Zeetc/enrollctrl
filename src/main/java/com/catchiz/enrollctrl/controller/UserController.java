@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,7 @@ public class UserController {
 
     @GetMapping("/getInviteCode")
     @ApiOperation("生成邀请码，有效期timeOut天")
+    @PreAuthorize(value = "hasAnyAuthority('manager','inviteCode')")
     public CommonResult getInviteCode(@RequestHeader String Authorization,Integer timeOut){
         return ManagerController.generateInviteCode(Authorization, userService, redisTemplate,timeOut);
     }
@@ -119,35 +121,6 @@ public class UserController {
             return new CommonResult(CommonStatus.NOTFOUND,"验证码错误");
         }
         userService.resetEmail(username,email);
-        return new CommonResult(CommonStatus.OK,"修改成功");
-    }
-
-    @GetMapping("/listProblemsByQuestionnaireId")
-    @ApiOperation("获取某问卷的所有题目")
-    public CommonResult listProblemsByQuestionnaireId(Integer questionnaireId,
-                                                      @RequestHeader String Authorization){
-        String username = JwtTokenUtil.getUsernameFromToken(Authorization);
-        User user= userService.getUserByUsername(username);
-        Questionnaire questionnaire=questionnaireService.getQuestionnaireByQuestionnaireId(questionnaireId);
-        if(user.getDepartmentId().equals(questionnaire.getDepartmentId())){
-            return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
-        }
-        List<Problem> problemList=problemService.listProblemsByQuestionnaireId(questionnaireId);
-        return new CommonResult(CommonStatus.OK,"查询成功",problemList);
-    }
-
-    @PatchMapping("/changeProblem")
-    @ApiOperation(("修改问卷题目"))
-    public CommonResult changeProblem(@RequestBody Problem p,
-                                      @RequestHeader String Authorization){
-        String username = JwtTokenUtil.getUsernameFromToken(Authorization);
-        User user= userService.getUserByUsername(username);
-        if(user==null)return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
-        Problem problem= problemService.getProblemByProblemId(p.getId());
-        Questionnaire questionnaire = questionnaireService.getQuestionnaireByQuestionnaireId(problem.getQuestionnaireId());
-        if(questionnaire==null)return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
-        if(!user.getDepartmentId().equals(questionnaire.getDepartmentId()))return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
-        problemService.changeProblem(p);
         return new CommonResult(CommonStatus.OK,"修改成功");
     }
 

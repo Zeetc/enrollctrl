@@ -1,9 +1,9 @@
 package com.catchiz.enrollctrl.service.impl;
 
 import com.catchiz.enrollctrl.mapper.AnswerAuthorMapper;
+import com.catchiz.enrollctrl.mapper.AnswerMapper;
 import com.catchiz.enrollctrl.pojo.AnswerAuthor;
 import com.catchiz.enrollctrl.service.AnswerAuthorService;
-import com.catchiz.enrollctrl.service.AnswerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,11 +13,11 @@ import java.util.List;
 public class AnswerAuthorServiceImpl implements AnswerAuthorService {
     private final AnswerAuthorMapper answerAuthorMapper;
 
-    private final AnswerService answerService;
+    private final AnswerMapper answerMapper;
 
-    public AnswerAuthorServiceImpl(AnswerAuthorMapper answerAuthorMapper, AnswerService answerService) {
+    public AnswerAuthorServiceImpl(AnswerAuthorMapper answerAuthorMapper, AnswerMapper answerMapper) {
         this.answerAuthorMapper = answerAuthorMapper;
-        this.answerService = answerService;
+        this.answerMapper = answerMapper;
     }
 
     @Override
@@ -65,6 +65,6 @@ public class AnswerAuthorServiceImpl implements AnswerAuthorService {
     @Transactional
     public void deleteAuthor(Integer authorId) {
         answerAuthorMapper.deleteAuthor(authorId);
-        answerService.deleteAuthor(authorId);
+        answerMapper.deleteAuthor(authorId);
     }
 }

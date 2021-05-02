@@ -3,7 +3,6 @@ package com.catchiz.enrollctrl.service.impl;
 import com.catchiz.enrollctrl.exception.MyAccessDeniedException;
 import com.catchiz.enrollctrl.exception.MyAuthenticationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -26,16 +25,16 @@ import javax.annotation.Resource;
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
-    @Resource
-    private SysUserDetailsService sysUserDetailsService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     private final StringRedisTemplate redisTemplate;
 
-    public CustomAuthenticationProvider(StringRedisTemplate redisTemplate) {
+    @Resource
+    private SysUserDetailsService sysUserDetailsService;
+
+    public CustomAuthenticationProvider(StringRedisTemplate redisTemplate, PasswordEncoder passwordEncoder) {
         this.redisTemplate = redisTemplate;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override

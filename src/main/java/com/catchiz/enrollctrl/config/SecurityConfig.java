@@ -3,16 +3,15 @@ package com.catchiz.enrollctrl.config;
 import com.catchiz.enrollctrl.handler.MyAccessDeniedHandler;
 import com.catchiz.enrollctrl.handler.MyAuthenticationEntryPoint;
 import com.catchiz.enrollctrl.service.impl.CustomAuthenticationProvider;
-import com.catchiz.enrollctrl.service.impl.SysUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -23,6 +22,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource
@@ -37,8 +37,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Resource
     private MyAccessDeniedHandler myAccessDeniedHandler;
 
-    @Resource
-    private SysUserDetailsService sysUserDetailsService;
 
     @Resource
     private AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource;
@@ -47,22 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Resource
     private CustomAuthenticationProvider customAuthenticationProvider;
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // 注册自己编写的认证逻辑
-        auth.authenticationProvider(customAuthenticationProvider);
-        auth.userDetailsService(sysUserDetailsService).passwordEncoder(new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence charSequence) {
-                return charSequence.toString();
-            }
-
-            @Override
-            public boolean matches(CharSequence charSequence, String s) {
-                return s.equals(charSequence.toString());
-            }
-        });
-    }
 
     @Override
     public void configure(WebSecurity web) {
@@ -102,8 +84,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .access("@rbacService.hasPermission(request)")
                 .and()
                 // 禁用session（完全禁用）
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                //.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                //.and()
                 .cors().and().csrf().disable();
 
         // 注册自定义异常

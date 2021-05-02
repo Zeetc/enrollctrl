@@ -32,4 +32,6 @@ public interface UserService {
     void resetEmail(String username, String email);
 
     List<User> listAllUserByDepartmentId(Integer departmentId);
+
+    User loadUserByUsername(String username);
 }

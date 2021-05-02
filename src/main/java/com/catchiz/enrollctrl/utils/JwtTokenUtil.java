@@ -2,11 +2,9 @@ package com.catchiz.enrollctrl.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 import java.io.Serializable;
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,11 +26,25 @@ public class JwtTokenUtil implements Serializable {
      * @param claims 数据声明
      * @return 令牌
      */
-    private static String generateToken(Map<String, Object> claims) {
+    public static String generateToken(Map<String, Object> claims) {
+        claims.put("created", new Date());
         Date expirationDate = new Date(System.currentTimeMillis() + 3600L * 1000);
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        Key key = Keys.hmacShaKeyFor(keyBytes);
-        return Jwts.builder().setClaims(claims).signWith(key).setExpiration(expirationDate).compact();
+        return Jwts.builder()
+                .setClaims(claims)
+                .setExpiration(expirationDate)
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
+    }
+
+    public static String generateTokenGivenTime(Integer time){
+        Map<String, Object> claims = new HashMap<>(3);
+        claims.put("created", new Date());
+        Date expirationDate = new Date(System.currentTimeMillis() + time * 1000);
+        return Jwts.builder()
+                .setClaims(claims)
+                .setExpiration(expirationDate)
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
     }
 
     /**
@@ -42,9 +54,8 @@ public class JwtTokenUtil implements Serializable {
      */
     public static Claims getClaimsFromToken(String token) {
         try {
-            return Jwts.parserBuilder()
+            return Jwts.parser()
                     .setSigningKey(secret)
-                    .build()
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
@@ -76,7 +87,7 @@ public class JwtTokenUtil implements Serializable {
         try {
             Claims claims = getClaimsFromToken(token);
             if(claims==null)return null;
-            return claims.getSubject();
+            return (String) claims.get("username");
         } catch (Exception e) {
             return null;
         }

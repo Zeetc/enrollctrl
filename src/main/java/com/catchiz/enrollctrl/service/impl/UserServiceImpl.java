@@ -1,14 +1,21 @@
 package com.catchiz.enrollctrl.service.impl;
 
 import com.catchiz.enrollctrl.mapper.UserMapper;
+import com.catchiz.enrollctrl.pojo.PermissionEntity;
 import com.catchiz.enrollctrl.pojo.User;
+import com.catchiz.enrollctrl.service.PermissionService;
+import com.catchiz.enrollctrl.service.RolePermissionService;
+import com.catchiz.enrollctrl.service.UserRoleService;
 import com.catchiz.enrollctrl.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -17,9 +24,13 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private PasswordEncoder passwordEncoder;
+    private final UserRoleService userRoleService;
 
-    public UserServiceImpl(UserMapper userMapper) {
+    public UserServiceImpl(UserMapper userMapper, UserRoleService userRoleService, RolePermissionService rolePermissionService, PermissionService permissionService) {
         this.userMapper = userMapper;
+        this.userRoleService = userRoleService;
+        this.rolePermissionService = rolePermissionService;
+        this.permissionService = permissionService;
     }
 
     @Override
@@ -28,11 +39,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void register(User user) {
         String password=user.getPassword();
         String encode = passwordEncoder.encode(password);
         user.setPassword(encode);
         userMapper.register(user);
+        userRoleService.insertUserRole(user.getUsername(),2);
     }
 
     @Override
@@ -93,5 +106,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> listAllUserByDepartmentId(Integer departmentId) {
         return userMapper.listAllUserByDepartmentId(departmentId);
+    }
+
+    private final RolePermissionService rolePermissionService;
+
+    private final PermissionService permissionService;
+
+    @Override
+    public User loadUserByUsername(String username) {
+        User user = userMapper.getUserByUsername(username);
+        user.setPermissionEntities(new ArrayList<>());
+        List<Integer> roles = userRoleService.getRoles(user.getUsername());
+        Set<String> set = new HashSet<>();
+        for (Integer roleId : roles) {
+            List<Integer> permissionIds = rolePermissionService.getPermissionIdsByRoleId(roleId);
+            for (Integer permissionId : permissionIds) {
+                PermissionEntity permissionEntity = permissionService.getPermissionById(permissionId);
+                if(set.contains(permissionEntity.getPermissionName()))continue;
+                user.getPermissionEntities().add(permissionEntity);
+                set.add(permissionEntity.getPermissionName());
+            }
+        }
+        return user;
     }
 }
