@@ -33,16 +33,18 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     }
 
     @Override
-    public void insertQuestionnaire(Questionnaire questionnaire, List<Problem> problems) {
+    public void insertQuestionnaire(Questionnaire questionnaire) {
         questionnaireMapper.insertQuestionnaire(questionnaire);
         int index=1;
-        for (Problem problem : problems) {
+        for (Problem problem : questionnaire.getProblemList()) {
             if(!ProblemType.typeSet.contains(problem.getType()))continue;
             problem.setId(null);
             problem.setIndex(index++);
             problem.setQuestionnaireId(questionnaire.getId());
-            String jsonVal = JSON.toJSONString(problem.getVal());
-            problem.setJsonVal(jsonVal);
+            if(problem.getVal()!=null) {
+                String jsonVal = JSON.toJSONString(problem.getVal());
+                problem.setJsonVal(jsonVal);
+            }
             problemMapper.insertProblem(problem);
         }
     }

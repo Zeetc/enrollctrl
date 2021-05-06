@@ -226,6 +226,10 @@ public class AuthController {
         }catch (Exception e){
             return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
         }
+        Questionnaire questionnaireByQuestionnaireId = questionnaireService.getQuestionnaireByQuestionnaireId(questionnaireId);
+        Timestamp cur = new Timestamp(System.currentTimeMillis());
+        Timestamp endDate = questionnaireByQuestionnaireId.getEndDate();
+        if(cur.after(endDate))return new CommonResult(CommonStatus.FORBIDDEN,"问卷已经截止");
         answerService.answerQuestions(answers,questionnaireId,author);
         return new CommonResult(CommonStatus.OK,"提交成功");
     }

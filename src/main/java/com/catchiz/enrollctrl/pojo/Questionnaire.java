@@ -7,6 +7,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @ApiModel("问卷类")
@@ -22,4 +23,6 @@ public class Questionnaire {
     private String describe;
     @ApiModelProperty("问卷结束时间")
     private Timestamp endDate;
+
+    private List<Problem> problemList;
 }

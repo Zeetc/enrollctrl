@@ -10,7 +10,7 @@ import java.util.List;
 @ApiModel("问卷结果类")
 public class Answer {
 
-    @ApiModelProperty("无需传参")
+    @ApiModelProperty("题目id")
     private Integer problemId;
     @ApiModelProperty("list类型的值，如果是多选的话需要传所有可选值")
     private List<String> val;
@@ -18,5 +18,6 @@ public class Answer {
     private Integer authorId;
     @ApiModelProperty("无需传参")
     private String jsonVal;
+    @ApiModelProperty("无需传参")
     private Integer questionnaireId;
 }

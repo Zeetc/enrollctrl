@@ -46,7 +46,6 @@ public class AnswerServiceImpl implements AnswerService {
             Problem problem=problemService.getProblemByProblemId(answer.getProblemId());
             if(problem==null)continue;
             if(!problem.getQuestionnaireId().equals(questionnaireId))continue;
-            answer.setProblemId(null);
             answer.setJsonVal(JSON.toJSONString(answer.getVal()));
             answer.setAuthorId(author.getAuthorId());
             answerMapper.insertAnswer(answer);

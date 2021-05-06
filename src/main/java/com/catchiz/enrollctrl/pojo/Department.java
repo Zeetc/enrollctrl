@@ -10,8 +10,8 @@ public class Department {
     @ApiModelProperty("无需传参")
     private Integer id;
     @ApiModelProperty("部门名字")
-    private String name;
+    private String departmentName;
     @ApiModelProperty("部门描述")
-    private String describe;
+    private String describes;
 
 }

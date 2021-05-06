@@ -38,12 +38,11 @@ public class QuestionnaireController {
     @ApiOperation("创建问卷并提交")
     @PreAuthorize(value = "hasAnyAuthority('manager','createQuestionnaire')")
     public CommonResult insertQuestionnaire(@RequestBody Questionnaire questionnaire,
-                                            @RequestBody List<Problem> problems,
                                             @RequestHeader String Authorization){
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
         Integer departmentId= userService.getDepartmentIdByUsername(username);
         if(departmentId==null)return new CommonResult(CommonStatus.FORBIDDEN,"无权限");
-        questionnaireService.insertQuestionnaire(questionnaire,problems);
+        questionnaireService.insertQuestionnaire(questionnaire);
         return new CommonResult(CommonStatus.CREATE,"创建成功",questionnaire.getId());
     }
 
