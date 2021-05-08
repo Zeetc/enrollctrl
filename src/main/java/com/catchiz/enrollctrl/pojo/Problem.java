@@ -17,7 +17,7 @@ public class Problem {
     @ApiModelProperty("题目可选值list")
     private List<String> val;
     @ApiModelProperty("题目索引，代表是问卷的第几题")
-    private Integer index;
+    private Integer idx;
     @ApiModelProperty("所属问卷id")
     private Integer questionnaireId;
     @ApiModelProperty("这个不需要传参")

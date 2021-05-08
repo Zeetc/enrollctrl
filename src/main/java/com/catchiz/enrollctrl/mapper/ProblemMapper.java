@@ -10,7 +10,7 @@ import java.util.List;
 
 @Mapper
 public interface ProblemMapper {
-    @Insert("insert into problem values(#{id},#{title},#{type},#{jsonVal},#{index},#{questionnaireId})")
+    @Insert("insert into problem values(#{id},#{title},#{type},#{jsonVal},#{idx},#{questionnaireId})")
     void insertProblem(Problem problem);
 
     @Select("select * from problem where questionnaireId = #{questionnaireId}")

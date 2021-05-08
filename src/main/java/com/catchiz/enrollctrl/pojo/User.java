@@ -27,7 +27,8 @@ public class User implements Serializable {
 
     private Integer departmentId;
     private Timestamp registerDate;
-    private String describe;
+    private String describes;
+    private Integer isManager;
 
     private List<PermissionEntity> permissionEntities;
 }

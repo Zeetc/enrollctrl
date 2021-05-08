@@ -1,6 +1,7 @@
 package com.catchiz.enrollctrl.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.catchiz.enrollctrl.exception.MyAccessDeniedException;
 import com.catchiz.enrollctrl.mapper.AnswerMapper;
 import com.catchiz.enrollctrl.pojo.*;
 import com.catchiz.enrollctrl.service.AnswerAuthorService;
@@ -13,7 +14,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -41,11 +41,17 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public void answerQuestions(List<Answer> answers, Integer questionnaireId, AnswerAuthor author) {
+        author.setIsPass(0);
+        author.setAuthorId(null);
+        author.setQuestionnaireId(questionnaireId);
         answerAuthorService.saveAuthor(author);
         for (Answer answer : answers) {
             Problem problem=problemService.getProblemByProblemId(answer.getProblemId());
             if(problem==null)continue;
-            if(!problem.getQuestionnaireId().equals(questionnaireId))continue;
+            if(!problem.getQuestionnaireId().equals(questionnaireId)){
+                throw new MyAccessDeniedException("非法回答");
+            }
+            answer.setQuestionnaireId(questionnaireId);
             answer.setJsonVal(JSON.toJSONString(answer.getVal()));
             answer.setAuthorId(author.getAuthorId());
             answerMapper.insertAnswer(answer);
@@ -59,13 +65,7 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public List<AnswerAuthor> getAllAnswerAuthor(Integer questionnaireId) {
-        List<Integer> list = answerMapper.getAllAnswerAuthor(questionnaireId);
-        List<AnswerAuthor> answerAuthors = new ArrayList<>();
-        for (Integer id : list) {
-            AnswerAuthor answerAuthor = answerAuthorService.getAuthorById(id);
-            answerAuthors.add(answerAuthor);
-        }
-        return answerAuthors;
+        return answerAuthorService.getAllAnswerAuthor(questionnaireId);
     }
 
     @Override

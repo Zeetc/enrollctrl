@@ -10,7 +10,7 @@ import java.util.List;
 
 @Mapper
 public interface AnswerMapper {
-    @Insert("insert into answer values(#{problemId},#{jsonVal},#{author})")
+    @Insert("insert into answer values(#{problemId},#{jsonVal},#{authorId},#{questionnaireId})")
     void insertAnswer(Answer answer);
 
     @Select("select * from answer where problemId = #{problemId}")
@@ -19,7 +19,7 @@ public interface AnswerMapper {
     @Select("select author_id from answer where questionnaire_id = #{questionnaireId}")
     List<Integer> getAllAnswerAuthor(Integer questionnaireId);
 
-    @Select("select * from answer where author_id = #{answerAuthorId}")
+    @Select("select * from answer where author_id = #{authorId}")
     List<Answer> getAnswerByAuthor(Integer answerAuthorId);
 
     @Delete("delete from answer where questionnaire_id = #{questionnaireId}")

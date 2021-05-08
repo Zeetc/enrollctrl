@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface AnswerAuthorMapper {
 
-    @Insert("insert into answer_author values(#{authorId},#{authorName},#{authorEmail},#{isPass}),#{questionnaireId}")
+    @Insert("insert into answer_author values(#{authorId},#{authorName},#{authorEmail},#{isPass},#{questionnaireId})")
     @Options(useGeneratedKeys = true,keyColumn = "author_id",keyProperty = "authorId")
     void saveAuthor(AnswerAuthor author);
 

@@ -115,6 +115,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User loadUserByUsername(String username) {
         User user = userMapper.getUserByUsername(username);
+        if(user==null)return null;
         user.setPermissionEntities(new ArrayList<>());
         List<Integer> roles = userRoleService.getRoles(user.getUsername());
         Set<String> set = new HashSet<>();

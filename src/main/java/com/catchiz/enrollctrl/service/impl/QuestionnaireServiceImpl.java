@@ -9,27 +9,25 @@ import com.catchiz.enrollctrl.pojo.Questionnaire;
 import com.catchiz.enrollctrl.service.AnswerAuthorService;
 import com.catchiz.enrollctrl.service.AnswerService;
 import com.catchiz.enrollctrl.service.QuestionnaireService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 @Service
 @Transactional
 public class QuestionnaireServiceImpl implements QuestionnaireService {
     private final QuestionnaireMapper questionnaireMapper;
     private final ProblemMapper problemMapper;
-    @Autowired
-    private AnswerAuthorService answerAuthorService;
-    @Autowired
-    private AnswerService answerService;
+    private final AnswerAuthorService answerAuthorService;
+    private final AnswerService answerService;
 
 
-    public QuestionnaireServiceImpl(QuestionnaireMapper questionnaireMapper, ProblemMapper problemMapper) {
+    public QuestionnaireServiceImpl(QuestionnaireMapper questionnaireMapper, ProblemMapper problemMapper, AnswerAuthorService answerAuthorService, AnswerService answerService) {
         this.questionnaireMapper = questionnaireMapper;
         this.problemMapper = problemMapper;
+        this.answerAuthorService = answerAuthorService;
+        this.answerService = answerService;
     }
 
     @Override
@@ -39,10 +37,11 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         for (Problem problem : questionnaire.getProblemList()) {
             if(!ProblemType.typeSet.contains(problem.getType()))continue;
             problem.setId(null);
-            problem.setIndex(index++);
+            problem.setIdx(index++);
             problem.setQuestionnaireId(questionnaire.getId());
             if(problem.getVal()!=null) {
                 String jsonVal = JSON.toJSONString(problem.getVal());
+                System.out.println(jsonVal);
                 problem.setJsonVal(jsonVal);
             }
             problemMapper.insertProblem(problem);

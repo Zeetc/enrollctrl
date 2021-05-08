@@ -9,10 +9,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -199,7 +196,7 @@ public class ManagerController {
 
     static CommonResult getQuestionnaireAns(Integer questionnaireId, ProblemService problemService, AnswerService answerService) {
         List<Problem> problems= problemService.getProblemIdsByQuestionnaireId(questionnaireId);
-        problems.sort(Comparator.comparingInt(Problem::getIndex));
+        problems.sort(Comparator.comparingInt(Problem::getIdx));
         List<List<Answer>> lists=new ArrayList<>();
         for (Problem problem : problems) {
             lists.add(answerService.getAnsByProblemId(problem.getId()));

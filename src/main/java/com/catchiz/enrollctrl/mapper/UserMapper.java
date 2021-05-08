@@ -11,7 +11,7 @@ public interface UserMapper {
     @Select("select count(username) from user where username = #{username}")
     int hasSameUsername(String username);
 
-    @Insert("insert into user values(#{username},#{password},#{email},#{gender},#{isManager},#{departmentId},#{registerDate},#{describe})")
+    @Insert("insert into user values(#{username},#{password},#{email},#{gender},#{departmentId},#{registerDate},#{describes},#{isManager})")
     void register(User user);
 
     @Delete("delete from user where username = #{username}")
@@ -35,8 +35,8 @@ public interface UserMapper {
     @Update("update user set username = #{name} where username = #{username}")
     void changeUsername(@Param("name") String name, @Param("username") String username);
 
-    @Update("update user set describes = #{describe} where username = #{username}")
-    void changeDescribe(@Param("describe") String describe, @Param("username") String username);
+    @Update("update user set describes = #{describes} where username = #{username}")
+    void changeDescribe(@Param("describes") String describes, @Param("username") String username);
 
     @Update("update user set gender = #{gender} where username = #{username}")
     void changeGender(@Param("gender") Integer gender, @Param("username") String username);
@@ -44,7 +44,7 @@ public interface UserMapper {
     @Update("update user set password = #{password} where username = #{username}")
     void changePassword(String username, @Param("password") String password);
 
-    @Update("update user set email = {email} where username = #{username}")
+    @Update("update user set email = #{email} where username = #{username}")
     void resetEmail(@Param("username") String username, @Param("email") String email);
 
     @Select("select * from user where departmentId = #{departmentId}")

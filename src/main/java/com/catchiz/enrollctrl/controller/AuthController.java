@@ -67,8 +67,9 @@ public class AuthController {
         if(userService.hasSameUsername(user.getUsername()))return new CommonResult(CommonStatus.FORBIDDEN,"该用户名已被注册");
         user.setDepartmentId(Integer.parseInt(inviteGroupId));
         user.setRegisterDate(new Timestamp(System.currentTimeMillis()));
-        if(!StringUtils.hasText(user.getDescribe())){
-            user.setDescribe("该用户暂未填写个人简介");
+        user.setIsManager(0);
+        if(!StringUtils.hasText(user.getDescribes())){
+            user.setDescribes("该用户暂未填写个人简介");
         }
         userService.register(user);
         return new CommonResult(CommonStatus.CREATE,"注册成功");
@@ -206,7 +207,7 @@ public class AuthController {
         if(questionnaireByQuestionnaireId==null)return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
         Timestamp cur = new Timestamp(System.currentTimeMillis());
         Timestamp endDate = questionnaireByQuestionnaireId.getEndDate();
-        if(cur.after(endDate))return new CommonResult(CommonStatus.FORBIDDEN,"问卷已经截止");
+        if(endDate!=null&&cur.after(endDate))return new CommonResult(CommonStatus.FORBIDDEN,"问卷已经截止");
         List<Problem> problemList=problemService.listProblemsByQuestionnaireId(questionnaireId);
         String uuid=UUID.randomUUID().toString();
         redisTemplate.opsForValue().set(uuid,questionnaireId.toString(),1,TimeUnit.DAYS);
@@ -229,7 +230,7 @@ public class AuthController {
         Questionnaire questionnaireByQuestionnaireId = questionnaireService.getQuestionnaireByQuestionnaireId(questionnaireId);
         Timestamp cur = new Timestamp(System.currentTimeMillis());
         Timestamp endDate = questionnaireByQuestionnaireId.getEndDate();
-        if(cur.after(endDate))return new CommonResult(CommonStatus.FORBIDDEN,"问卷已经截止");
+        if(endDate!=null&&cur.after(endDate))return new CommonResult(CommonStatus.FORBIDDEN,"问卷已经截止");
         answerService.answerQuestions(questionnaireAnswer.getAnswerList(),questionnaireId,questionnaireAnswer.getAuthor());
         return new CommonResult(CommonStatus.OK,"提交成功");
     }

@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.util.Objects;
 
+
 @Data
 public class AnswerAuthor {
     private Integer authorId;
@@ -19,16 +20,16 @@ public class AnswerAuthor {
 
         AnswerAuthor that = (AnswerAuthor) o;
 
-        if (!Objects.equals(authorId, that.authorId)) return false;
         if (!Objects.equals(authorName, that.authorName)) return false;
-        return Objects.equals(authorEmail, that.authorEmail);
+        if (!Objects.equals(authorEmail, that.authorEmail)) return false;
+        return Objects.equals(isPass, that.isPass);
     }
 
     @Override
     public int hashCode() {
-        int result = authorId != null ? authorId.hashCode() : 0;
-        result = 131 * result + (authorName != null ? authorName.hashCode() : 0);
-        result = 131 * result + (authorEmail != null ? authorEmail.hashCode() : 0);
+        int result = authorName != null ? authorName.hashCode() : 0;
+        result = 31 * result + (authorEmail != null ? authorEmail.hashCode() : 0);
+        result = 31 * result + (isPass != null ? isPass.hashCode() : 0);
         return result;
     }
 }

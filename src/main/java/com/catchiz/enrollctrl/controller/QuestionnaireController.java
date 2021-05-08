@@ -22,6 +22,7 @@ public class QuestionnaireController {
     private final UserService userService;
     private final ProblemService problemService;
     private final AnswerService answerService;
+    private final ThreadPoolExecutor executor;
 
     private final AnswerAuthorService answerAuthorService;
 
@@ -42,6 +43,7 @@ public class QuestionnaireController {
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
         Integer departmentId= userService.getDepartmentIdByUsername(username);
         if(departmentId==null)return new CommonResult(CommonStatus.FORBIDDEN,"无权限");
+        questionnaire.setDepartmentId(departmentId);
         questionnaireService.insertQuestionnaire(questionnaire);
         return new CommonResult(CommonStatus.CREATE,"创建成功",questionnaire.getId());
     }
@@ -79,8 +81,8 @@ public class QuestionnaireController {
         List<AnswerAuthor> secondAnswerAuthor = answerService.getAllAnswerAuthor(second);
         List<AnswerAuthor> both = new ArrayList<>();
         List<AnswerAuthor> reject = new ArrayList<>();
-        for (AnswerAuthor answerAuthor : secondAnswerAuthor) {
-            if(firstAnswerAuthor.contains(answerAuthor)){
+        for (AnswerAuthor answerAuthor : firstAnswerAuthor) {
+            if(secondAnswerAuthor.contains(answerAuthor)){
                 both.add(answerAuthor);
             }else reject.add(answerAuthor);
         }
@@ -113,8 +115,6 @@ public class QuestionnaireController {
         }
         return new CommonResult(CommonStatus.OK,"查询成功",problem);
     }
-
-    private final ThreadPoolExecutor executor;
 
     @GetMapping("/sendAllUserEmail")
     @ApiOperation("群发消息，根据问卷Id")
@@ -187,7 +187,7 @@ public class QuestionnaireController {
     @DeleteMapping("/deleteQuestionnaire")
     @ApiOperation("删除问卷，同时会删除问卷的所有答卷，以及回答者的信息")
     @PreAuthorize(value = "hasAnyAuthority('manager','deleteQuestionnaire')")
-    public CommonResult deleteQuestionnaire(Integer questionnaireId, String Authorization){
+    public CommonResult deleteQuestionnaire(Integer questionnaireId, @RequestHeader String Authorization){
         CommonResult FORBIDDEN = checkPermission(questionnaireId, Authorization);
         if (FORBIDDEN != null) return FORBIDDEN;
         questionnaireService.deleteQuestionnaire(questionnaireId);
@@ -212,7 +212,7 @@ public class QuestionnaireController {
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
         User user= userService.getUserByUsername(username);
         Questionnaire questionnaire=questionnaireService.getQuestionnaireByQuestionnaireId(questionnaireId);
-        if(user.getDepartmentId().equals(questionnaire.getDepartmentId())){
+        if(user.getDepartmentId().equals(questionnaire.getDepartmentId())&&user.getIsManager()!=1){
             return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
         }
         List<Problem> problemList=problemService.listProblemsByQuestionnaireId(questionnaireId);
@@ -230,7 +230,7 @@ public class QuestionnaireController {
         Problem problem= problemService.getProblemByProblemId(p.getId());
         Questionnaire questionnaire = questionnaireService.getQuestionnaireByQuestionnaireId(problem.getQuestionnaireId());
         if(questionnaire==null)return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
-        if(!user.getDepartmentId().equals(questionnaire.getDepartmentId()))return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
+        if(!user.getDepartmentId().equals(questionnaire.getDepartmentId())&&user.getIsManager()!=1)return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
         problemService.changeProblem(p);
         return new CommonResult(CommonStatus.OK,"修改成功");
     }
@@ -253,7 +253,7 @@ public class QuestionnaireController {
         User user=userService.getUserByUsername(username);
         if(user==null)return new CommonResult(CommonStatus.FORBIDDEN,"无权限");
         Questionnaire questionnaire=questionnaireService.getQuestionnaireByQuestionnaireId(questionnaireId);
-        if(questionnaire==null||!user.getDepartmentId().equals(questionnaire.getDepartmentId())){
+        if(questionnaire==null||(!user.getDepartmentId().equals(questionnaire.getDepartmentId())&&user.getIsManager()!=1)){
             return new CommonResult(CommonStatus.FORBIDDEN,"无权限");
         }
         return null;
