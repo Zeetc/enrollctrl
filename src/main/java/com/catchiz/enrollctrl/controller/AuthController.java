@@ -215,7 +215,7 @@ public class AuthController {
 
     @PostMapping("/answerQuestions")
     @ApiOperation("提交问卷答案")
-    public CommonResult answerQuestions(@RequestBody List<Answer> answers,@RequestBody AnswerAuthor author,
+    public CommonResult answerQuestions(@RequestBody QuestionnaireAnswer questionnaireAnswer,
                                         @RequestHeader String Authorization){
         if(!StringUtils.hasText(Authorization))return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");
         int questionnaireId;
@@ -230,7 +230,7 @@ public class AuthController {
         Timestamp cur = new Timestamp(System.currentTimeMillis());
         Timestamp endDate = questionnaireByQuestionnaireId.getEndDate();
         if(cur.after(endDate))return new CommonResult(CommonStatus.FORBIDDEN,"问卷已经截止");
-        answerService.answerQuestions(answers,questionnaireId,author);
+        answerService.answerQuestions(questionnaireAnswer.getAnswerList(),questionnaireId,questionnaireAnswer.getAuthor());
         return new CommonResult(CommonStatus.OK,"提交成功");
     }
 }

@@ -13,7 +13,7 @@ public interface ProblemMapper {
     @Insert("insert into problem values(#{id},#{title},#{type},#{jsonVal},#{index},#{questionnaireId})")
     void insertProblem(Problem problem);
 
-    @Select("select * from question where questionnaireId = #{questionnaireId}")
+    @Select("select * from problem where questionnaireId = #{questionnaireId}")
     List<Problem> listProblemsByQuestionnaireId(Integer questionnaireId);
 
     @Select("select * from problem where id = #{problemId}")
