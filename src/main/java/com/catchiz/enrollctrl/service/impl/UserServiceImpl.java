@@ -55,7 +55,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void resetPassword(String username, String password) {
-        userMapper.resetPassword(username,password);
+        String bPassword = passwordEncoder.encode(password);
+        userMapper.resetPassword(username,bPassword);
     }
 
     @Override

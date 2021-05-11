@@ -1,10 +1,7 @@
 package com.catchiz.enrollctrl.mapper;
 
 import com.catchiz.enrollctrl.pojo.Problem;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -22,6 +19,9 @@ public interface ProblemMapper {
     @Select("select * from problem where questionnaireId = #{questionnaireId}")
     List<Problem> getProblemsByQuestionnaireId(Integer questionnaireId);
 
-    @Update("update problem set title = #{title} and type = #{type} and #{jsonVal} = #{jsonVal} where id = #{id}")
-    void changeProblem(Problem p);
+    @Update("update problem set title = #{title}, type = #{type}, jsonVal = #{jsonVal} where id = #{id}")
+    void changeProblem(Problem problem);
+
+    @Delete("delete from problem where questionnaireId = #{questionnaireId}")
+    void deleteQuestionnaire(Integer questionnaireId);
 }

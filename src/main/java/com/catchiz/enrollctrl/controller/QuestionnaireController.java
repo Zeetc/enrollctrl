@@ -86,6 +86,11 @@ public class QuestionnaireController {
                 both.add(answerAuthor);
             }else reject.add(answerAuthor);
         }
+        for (AnswerAuthor answerAuthor : secondAnswerAuthor) {
+            if(firstAnswerAuthor.contains(answerAuthor)){
+                both.add(answerAuthor);
+            }else reject.add(answerAuthor);
+        }
         return new CommonResult(CommonStatus.OK,"获取成功", Arrays.asList(both,reject));
     }
 
@@ -222,16 +227,19 @@ public class QuestionnaireController {
     @PatchMapping("/changeProblem")
     @ApiOperation(("修改问卷题目"))
     @PreAuthorize(value = "hasAnyAuthority('manager','updateQuestionnaire')")
-    public CommonResult changeProblem(@RequestBody Problem p,
+    public CommonResult changeProblem(@RequestBody Problem problem,
                                       @RequestHeader String Authorization){
         String username = JwtTokenUtil.getUsernameFromToken(Authorization);
         User user= userService.getUserByUsername(username);
         if(user==null)return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
-        Problem problem= problemService.getProblemByProblemId(p.getId());
-        Questionnaire questionnaire = questionnaireService.getQuestionnaireByQuestionnaireId(problem.getQuestionnaireId());
+        Problem myProblem= problemService.getProblemByProblemId(problem.getId());
+        Questionnaire questionnaire = questionnaireService.getQuestionnaireByQuestionnaireId(myProblem.getQuestionnaireId());
         if(questionnaire==null)return new CommonResult(CommonStatus.NOTFOUND,"未找到问卷");
         if(!user.getDepartmentId().equals(questionnaire.getDepartmentId())&&user.getIsManager()!=1)return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
-        problemService.changeProblem(p);
+        if(!ProblemType.typeSet.contains(problem.getType())){
+            return new CommonResult(CommonStatus.FORBIDDEN,"问题类型非法");
+        }
+        problemService.changeProblem(problem);
         return new CommonResult(CommonStatus.OK,"修改成功");
     }
 

@@ -59,6 +59,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         questionnaireMapper.deleteQuestionnaire(questionnaireId);
         answerAuthorService.deleteQuestionnaire(questionnaireId);
         answerService.deleteQuestionnaire(questionnaireId);
+        problemMapper.deleteQuestionnaire(questionnaireId);
     }
 
     @Override

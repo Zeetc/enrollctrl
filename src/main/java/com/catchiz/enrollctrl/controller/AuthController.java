@@ -6,7 +6,9 @@ import com.catchiz.enrollctrl.service.ProblemService;
 import com.catchiz.enrollctrl.service.QuestionnaireService;
 import com.catchiz.enrollctrl.service.UserService;
 import com.catchiz.enrollctrl.valid.RegisterGroup;
+import com.catchiz.enrollctrl.vo.RegisterVo;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -54,8 +56,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @ApiOperation("用户登录，需要邀请码，同时需要输入验证码")
-    public CommonResult register(@Validated({RegisterGroup.class}) User user, String inviteCode, String inputVerify,
+    @ApiOperation("用户注册，需要邀请码，同时需要输入验证码")
+    public CommonResult register(@Validated({RegisterGroup.class}) RegisterVo user, String inviteCode, String inputVerify,
                                  @RequestHeader String Authorization){
         ValueOperations<String, String> operations = redisTemplate.opsForValue();
         String verifyCode = operations.get(Authorization);
@@ -65,13 +67,15 @@ public class AuthController {
         String inviteGroupId = operations.get(inviteCode);
         if(!StringUtils.hasText(inviteGroupId))return new CommonResult(CommonStatus.NOTFOUND,"邀请码无效或者已过期");
         if(userService.hasSameUsername(user.getUsername()))return new CommonResult(CommonStatus.FORBIDDEN,"该用户名已被注册");
-        user.setDepartmentId(Integer.parseInt(inviteGroupId));
-        user.setRegisterDate(new Timestamp(System.currentTimeMillis()));
-        user.setIsManager(0);
+        User myUser = new User();
+        BeanUtils.copyProperties(user,myUser);
+        myUser.setDepartmentId(Integer.parseInt(inviteGroupId));
+        myUser.setRegisterDate(new Timestamp(System.currentTimeMillis()));
+        myUser.setIsManager(0);
         if(!StringUtils.hasText(user.getDescribes())){
             user.setDescribes("该用户暂未填写个人简介");
         }
-        userService.register(user);
+        userService.register(myUser);
         return new CommonResult(CommonStatus.CREATE,"注册成功");
     }
 
@@ -172,7 +176,7 @@ public class AuthController {
         if(!StringUtils.hasText(username))return new CommonResult(CommonStatus.FORBIDDEN,"用户名不能为空");
         if(!userService.hasSameUsername(username))return new CommonResult(CommonStatus.FORBIDDEN,"无该用户");
         ValueOperations<String, String> operations = redisTemplate.opsForValue();
-        if(operations.get(username)!=null)return new CommonResult(CommonStatus.FORBIDDEN,"频繁请求, 1分钟后再试");
+        if(StringUtils.hasText(operations.get(username+"#")))return new CommonResult(CommonStatus.FORBIDDEN,"频繁请求, 1分钟后再试");
         return UserController.sendEmailVerifyCode(username, operations, emailSendUser, userService, mailSender);
     }
 
@@ -185,10 +189,10 @@ public class AuthController {
             return new CommonResult(CommonStatus.FORBIDDEN,"参数不能为空");
         }
         ValueOperations<String, String> operations = redisTemplate.opsForValue();
-        String uname=operations.get(verifyCode);
-        if(!StringUtils.hasText(uname))return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");
-        if(!uname.equals(username))return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
-        redisTemplate.delete(verifyCode);
+        String code=operations.get(username);
+        if(!StringUtils.hasText(code))return new CommonResult(CommonStatus.FORBIDDEN,"非法参数");
+        if(!code.equals(verifyCode))return new CommonResult(CommonStatus.FORBIDDEN,"没有权限");
+        redisTemplate.delete(username);
         userService.resetPassword(username,password);
         return new CommonResult(CommonStatus.OK,"修改成功");
     }

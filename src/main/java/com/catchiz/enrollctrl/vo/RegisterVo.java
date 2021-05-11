@@ -1,4 +1,4 @@
-package com.catchiz.enrollctrl.pojo;
+package com.catchiz.enrollctrl.vo;
 
 import com.catchiz.enrollctrl.valid.RegisterGroup;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -6,14 +6,11 @@ import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
-import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.List;
 
 @Data
-public class User implements Serializable {
+public class RegisterVo {
     private static final long serialVersionUID = 1L;
     @NotBlank(groups = {RegisterGroup.class},message = "用户名不能为空")
     private String username;
@@ -27,17 +24,6 @@ public class User implements Serializable {
     @Pattern(regexp = "^[0|1]$",groups = {RegisterGroup.class},message = "性别输入不合法")
     private Integer gender;
 
-    @JsonIgnore
-    private Integer departmentId;
-
-    @JsonIgnore
-    private Timestamp registerDate;
-
     private String describes;
 
-    @JsonIgnore
-    private Integer isManager;
-
-    @JsonIgnore
-    private List<PermissionEntity> permissionEntities;
 }

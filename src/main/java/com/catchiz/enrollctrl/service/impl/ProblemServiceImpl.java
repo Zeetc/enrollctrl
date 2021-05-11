@@ -38,8 +38,8 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public void changeProblem(Problem p) {
-        p.setJsonVal(JSON.toJSONString(p.getVal()));
-        problemMapper.changeProblem(p);
+    public void changeProblem(Problem problem) {
+        problem.setJsonVal(JSON.toJSONString(problem.getVal()));
+        problemMapper.changeProblem(problem);
     }
 }
