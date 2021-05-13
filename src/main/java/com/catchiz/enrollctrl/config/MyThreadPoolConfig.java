@@ -9,10 +9,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-@EnableConfigurationProperties(ThreadPoolConfigProperties.class)
+@EnableConfigurationProperties(ThreadPoolConfig.class)
 public class MyThreadPoolConfig {
     @Bean
-    public ThreadPoolExecutor threadPoolExecutor(ThreadPoolConfigProperties properties) {
+    public ThreadPoolExecutor threadPoolExecutor(ThreadPoolConfig properties) {
         return new ThreadPoolExecutor(
                 properties.getCorePoolSize(),
                 properties.getMaxPoolSize(),

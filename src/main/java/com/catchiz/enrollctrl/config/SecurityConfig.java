@@ -69,7 +69,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationDetailsSource(authenticationDetailsSource)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/auth/**", "/favicon.ico","/pages/**").permitAll()
+                .antMatchers("/auth/**", "/favicon.ico","/pages/**","/oss/**").permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
 
                 //  swagger 访问开放

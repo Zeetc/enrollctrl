@@ -1,6 +1,7 @@
 package com.catchiz.enrollctrl.controller;
 
 import com.catchiz.enrollctrl.pojo.*;
+import com.catchiz.enrollctrl.service.ArticleService;
 import com.catchiz.enrollctrl.service.ProblemService;
 import com.catchiz.enrollctrl.service.QuestionnaireService;
 import com.catchiz.enrollctrl.service.UserService;
@@ -45,7 +46,7 @@ public class UserController {
     @Value("${spring.mail.username}")
     private String emailSendUser;
 
-    public UserController(UserService userService, StringRedisTemplate redisTemplate, PasswordEncoder passwordEncoder, JavaMailSender mailSender, ProblemService problemService, QuestionnaireService questionnaireService, ThreadPoolExecutor executor) {
+    public UserController(UserService userService, StringRedisTemplate redisTemplate, PasswordEncoder passwordEncoder, JavaMailSender mailSender, ProblemService problemService, QuestionnaireService questionnaireService, ThreadPoolExecutor executor, ArticleService articleService) {
         this.userService = userService;
         this.redisTemplate = redisTemplate;
         this.passwordEncoder = passwordEncoder;
@@ -53,6 +54,7 @@ public class UserController {
         this.problemService = problemService;
         this.questionnaireService = questionnaireService;
         this.executor = executor;
+        this.articleService = articleService;
     }
 
 
@@ -139,6 +141,18 @@ public class UserController {
         }
         userService.resetEmail(username,email);
         return new CommonResult(CommonStatus.OK,"修改成功");
+    }
+
+    private final ArticleService articleService;
+
+    @GetMapping("/getMyDepartmentArticle")
+    @ApiOperation("获取自己部门的article")
+    public CommonResult getMyDepartmentArticle(@RequestHeader String Authorization){
+        String username = JwtTokenUtil.getUsernameFromToken(Authorization);
+        if(!StringUtils.hasText(username))return new CommonResult(CommonStatus.FORBIDDEN,"输入不合法");
+        User user = userService.getUserByUsername(username);
+        Article article = articleService.getArticleByDepartmentId(user.getDepartmentId());
+        return new CommonResult(CommonStatus.OK,"查询成功",article);
     }
 
 

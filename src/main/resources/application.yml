@@ -20,6 +20,7 @@ spring:
     host: smtp.163.com
   profiles:
     active: prop
+#涉及密钥的字段均放在另一prop.yml中，未上传到git
 
 mybatis:
   configuration:

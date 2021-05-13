@@ -1,10 +1,7 @@
 package com.catchiz.enrollctrl.controller;
 
 import com.catchiz.enrollctrl.pojo.*;
-import com.catchiz.enrollctrl.service.AnswerService;
-import com.catchiz.enrollctrl.service.ProblemService;
-import com.catchiz.enrollctrl.service.QuestionnaireService;
-import com.catchiz.enrollctrl.service.UserService;
+import com.catchiz.enrollctrl.service.*;
 import com.catchiz.enrollctrl.valid.RegisterGroup;
 import com.catchiz.enrollctrl.vo.RegisterVo;
 import io.swagger.annotations.ApiOperation;
@@ -46,13 +43,14 @@ public class AuthController {
     @Value("${spring.mail.username}")
     private String emailSendUser;
 
-    public AuthController(UserService userService, StringRedisTemplate redisTemplate, JavaMailSender mailSender, QuestionnaireService questionnaireService, ProblemService problemService, AnswerService answerService) {
+    public AuthController(UserService userService, StringRedisTemplate redisTemplate, JavaMailSender mailSender, QuestionnaireService questionnaireService, ProblemService problemService, AnswerService answerService, ArticleService articleService) {
         this.userService = userService;
         this.redisTemplate = redisTemplate;
         this.mailSender = mailSender;
         this.questionnaireService = questionnaireService;
         this.problemService = problemService;
         this.answerService = answerService;
+        this.articleService = articleService;
     }
 
     @PostMapping("/register")
@@ -237,5 +235,13 @@ public class AuthController {
         if(endDate!=null&&cur.after(endDate))return new CommonResult(CommonStatus.FORBIDDEN,"问卷已经截止");
         answerService.answerQuestions(questionnaireAnswer.getAnswerList(),questionnaireId,questionnaireAnswer.getAuthor());
         return new CommonResult(CommonStatus.OK,"提交成功");
+    }
+    private final ArticleService articleService;
+
+    @GetMapping("/getArticleByDepartmentId")
+    @ApiOperation("获取部门介绍")
+    public CommonResult getArticleByDepartmentId(Integer departmentId){
+        Article article = articleService.getArticleByDepartmentId(departmentId);
+        return new CommonResult(CommonStatus.OK,"获取成功",article);
     }
 }
